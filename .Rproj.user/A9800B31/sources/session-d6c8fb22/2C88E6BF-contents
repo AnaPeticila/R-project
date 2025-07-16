@@ -1,0 +1,284 @@
+x<-1:50
+x[3]
+x[c(1,5,9)]
+y<-x
+y[c(7,13)]<-100
+m<-matrix(data=c(10,6,5,1,2,3,31,8,1),nrow=3,ncol=3, byrow=F)
+row.names(m)=c("r1","r2","r3")
+colnames(m)=c("c1","c2","c3")
+A<-m
+A
+m[,2]
+coloana2<-m[,2]
+suma<-sum(coloana2)
+patrat<-coloana2^2
+m^2
+m%*%m
+solve(m)
+sd(m)
+sd(coloana2)
+tm<-t(m)
+a<-matrix(10:18,nrow=3,byrow=T)
+m%*%a
+produs<-m%*%a
+
+s<-seq(from=0,to=10,by=0.5)
+min(s)
+max(s)
+mean(s)
+var(s)
+x<-s
+x
+plot(x,type="l",col="blue",main="Grafic nr aleatoare",ylab="valori",xlab="nr")
+plot(x,type="h",col="blue",main="Grafic nr aleatoare",ylab="valori",xlab="nr")
+plot(x,col="blue",main="Grafic nr aleatoare",ylab="valori",xlab="nr")
+
+#generati n=100 de valori N(m=5,s=1.3)
+n=100
+medie=5
+sd=1.3
+set.seed(1044)
+valori<-rnorm(n,medie,sd)
+mean(valori)
+sd(valori)
+min(valori)
+which.min(valori)
+valori[30]
+valori[12]
+valori[valori==min(valori)]
+sortare<-sort(valori,decreasing=T)
+hist(sortare,freq = F,col="lightblue",main="Distributie")
+hist(valori,freq = F,col="blue",main="Distributie")
+plot(sortare,type="l",col="pink")
+
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+actiuni2<-read.csv("PFE.csv",header=TRUE,sep=",",dec=".")
+actiuni<-read.table("PFE.txt",header=TRUE,sep="\t",dec=".")
+fix(actiuni)
+attach(actiuni)
+head(actiuni)
+names(actiuni)
+actiuni_comune<-data.frame(Date,Pret.PFE,Pret.Indice.S.P.)
+summary(actiuni_comune[,-1])
+write.csv(s,"statisticidescriptive.csv")
+
+m<-matrix(c(diff(range(Pret.PFE)),diff(range( Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.)),nrow = 2,byrow = T)
+row.names(m)<-c("Amplitudine","sd")
+colnames(m)<-c("PFE","S&P")
+
+max(Pret.PFE)
+which.max(Pret.PFE)
+max( Pret.Indice.S.P.)
+which.max( Pret.Indice.S.P.)
+Date[which.max(Pret.Indice.S.P.)]
+plot(Pret.Indice.S.P.,type="l",col="red")
+
+ts<-data.frame(Pret.PFE,Pret.Indice.S.P.)
+plot.ts(ts,plot.type = "multiple",col="blue",main="Evolutie preturi")
+
+windows()
+par(mfrow=c(2,1))
+hist(Pret.PFE,main="hist PFE",col="blue")
+hist(Pret.Indice.S.P., main="hist S&P",col="lightblue")
+
+install.packages("moments")
+library(moments)
+#coeficient de asimetrie
+skewness(Pret.PFE)
+skewness(Pret.Indice.S.P.)
+#coef de aplatizare
+kurtosis(Pret.PFE)
+kurtosis(Pret.Indice.S.P.)
+
+matr_corelatie<-cor(ts)
+install.packages("corrplot")
+library(corrplot)
+windows()
+corrplot(matr_corelatie,main="Matrice de corelatie")
+names(actiuni)
+co<-data.frame(Pret.MRK,Pret.MSFT,Pret.PFE,Pret.AAPL,Pret.Indice.S.P.)
+matr_corelatie2<-cor(co)
+corrplot(matr_corelatie2, main="matr de corel 2")
+
+R<-cor(actiuni[,-1])
+corrplot(R,type="upper",method="ellipse")
+
+boxplot(Pret.PFE,horizontal = TRUE)
+install.packages("moments")
+library(moments)
+casSP<-skewness(Pret.Indice.S.P.)
+casPFE<-skewness(Pret.PFE)
+quantile(Pret.PFE)
+
+windows()
+par(mfrow=c(2,2))
+boxplot(Pret.PFE,horizontal = TRUE, main="Boxplot PFE",col="plum")
+hist(Pret.PFE,main="Hist PFE",col="plum")
+boxplot(Pret.Indice.S.P.,horizontal = TRUE, main="Boxplot sp", col="lightblue")
+hist(Pret.Indice.S.P., main="Hist sp", col="lightblue")
+
+m<-matrix(c(diff(range(Pret.PFE)),diff(range( Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.)),nrow = 2,byrow = T)
+row.names(m)<-c("Amplitudine","sd")
+colnames(m)<-c("PFE","S&P")
+
+cvSP<-100*sd(Pret.Indice.S.P.)/mean(Pret.Indice.S.P.)
+cvPFE<-100*sd(Pret.PFE)/mean(Pret.PFE)
+m<-matrix(c(diff(range(Pret.PFE)),diff(range( Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.),cvPFE,cvSP),nrow = 3,byrow = T)
+row.names(m)<-c("Amplitudine","sd","cv")
+colnames(m)<-c("PFE","S&P")
+m
+
+#n=1500 de companii, sectoare de activitate: Agricultura(5%), Industrie(35%), Comert(15%), Transporturi(25%), Turism(20%)
+#dimensiunea firmei: mici(60%), mijlocii(30%), mari(10%)
+id<-1:1500
+set.seed(1)
+sectoare<-sample(c("Agr","Ind","Comert","Transp","Turism"),size=1500,replace = TRUE, prob=c(0.05,0.35,0.15,0.25,0.20))
+sector<-factor(sector)
+
+set.seed(2)
+dim<-sample(1:3,size=1500,replace=T,prob=c(0.6,0.3,0.1))
+dim<-factor(dim)
+is.factor(dim)
+table(dim)
+levels(dim)<-c("mici","mijlocii","mari")
+table(dim)
+
+companii<-data.frame(id,sector,dim)
+table(sector,dim)
+
+#adaugam alte caracteristici
+#generare venit
+#Firme mari N(800000,170000) distributia normala(medie,ab std)
+#Firme medii N(600000,140000)
+#Firme mici N(300000,90000)
+
+#Firme mari
+dfmari<-subset(companii,companii$dim=="mari")
+set.seed(3)
+dfmari$venit<-rnorm(dim(dfmari)[1],800000,170000)
+
+#Firme mijlocii
+dfmijlocii<-subset(companii,companii$dim=="mijlocii")
+set.seed(4)
+dfmijlocii$venit<-rnorm(dim(dfmijlocii)[1],600000,140000)
+
+#Firme mici
+dfmici<-subset(companii,companii$dim=="mici")
+set.seed(5)
+dfmici$venit<-rnorm(dim(dfmici)[1],300000,90000)
+
+companii<-rbind(dfmari,dfmijlocii,dfmici)
+
+#Generare variabila investitii
+#investitiile=10000+0.4*venit+eps
+#eps ~ N(0,1)
+
+eps<-rnorm(1500)
+companii$investitii<-10000+0.4*companii$venit+eps
+
+#generare costuri
+#mari ~N(400000,200000)
+#medii ~N(350000,100000)
+#mici ~ N(140000,60000)
+
+set.seed(7)
+companii$costuri<-rep(0,1500)
+companii$costuri[which(companii$dim=="mari")]<-rnorm(dim(dfmari)[1],400000,200000)
+proba<-which(companii$dim=="mari")
+
+set.seed(8)
+companii$costuri[which(companii$dim=="mijlocii")]<-rnorm(dim(dfmijlocii)[1],350000,100000)
+
+set.seed(9)
+companii$costuri[which(companii$dim=="mici")]<-rnorm(dim(dfmici)[1],140000,60000)
+
+dfmariIND<-subset(companii, companii$dim=="mari" & companii$sector=="Ind")
+dim(dfmariIND)[1]
+
+dfmiciTUR<-subset(companii,companii$dim=="mici" & companii$sector=="Turism")
+dfmiciInd<-subset(companii, companii$dim=="mici" & companii$sector=="Ind")
+mean(dfmiciInd$venit)
+mean(dfmiciTUR$venit)
+
+companii$profit<-companii$venit-companii$costuri
+companii$rent<-companii$profit/companii$venit
+
+boxplot(dfmiciTUR, horizontal = T, col="green",main="Boxplot firme mici turism")
+
+ind<-subset(companii, sector=="Ind")
+mean(ind$venit)
+
+#estimare cerere
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+cerere<-read.csv("cerere.csv",header = TRUE, sep=";",dec=".")
+#analiza evolutiei FOOD
+
+attach(cerere)
+serii<-ts(cbind(FOOD,PFOOD),start=1959)
+windows()
+plot.ts(serii,plot.type = "multiple", col="red",main="Evolutia cererii si a pretului")
+modifFOOD<-100*diff(FOOD)/FOOD[-45]
+modifPFOOD<-100*diff(PFOOD)/PFOOD[-45]
+modificari<-data.frame(1960:2003,modifFOOD,modifPFOOD)
+which.max(modifFOOD)
+which.max(modificari$modifFOOD)
+modificari[,1][which.max(modificari$modifFOOD)]
+modificari[,1][which.max(modificari$modifFOOD<(-1))]
+hist(modificari$modifFOOD, col="blue")
+
+cerere$PFOODr<-cerere$PFOOD/cerere$PTPE
+mean(cerere$PFOODr)
+sd(cerere$PFOODr)
+mean(cerere$FOOD)
+sd(cerere$FOOD)
+cvFOOD<-sd(cerere$FOOD)/mean(cerere$FOOD)
+cvPFOODr<-sd(cerere$PFOODr)/mean(cerere$PFOODr)
+
+q<-quantile(cerere$FOOD)
+q[3]
+
+plot(density(cerere$FOOD),col="red")
+plot(density(cerere$PFOODr),col="green")
+windows()
+par(mfrow=c(2,2))
+boxplot(cerere$FOOD,horizontal=T,col="blue", main="Boxplot cerere FOOD")
+boxplot(cerere$PFOODr,horizontal = T, col="red",main="Boxplot pret PDFOODr")
+
+#coeficientul de asimetrie
+skewness(cerere$FOOD)
+skewness(cerere$PFOODr)
+#coeficientul de aplatizare
+kurtosis(cerere$FOOD)
+kurtosis(cerere$PFOODr)
+
+windows()
+plot(cerere$PFOODr,cerere$FOOD)
+abline(lm(cerere$FOOD~cerere$PFOODr),col="lightblue")
+cor(FOOD, PFOODr)
+
+#fct de cerere directa liniara
+model1<-lm(FOOD~PFOODr, data=cerere)#model de regresie
+summary(model1)
+
+attach(cerere)
+cerere$PFOODr<-100*PFOOD/PTPE
+model1$coefficients
+confint(model1)
+
+#rezidurile modelului
+r<-model1$residuals
+cerereEstimata<-model1$fitted.values
+hist(r,col="purple")
+plot(r, type="l",col="pink")
+
+#cerere indirecta
+model1i<-lm(PFOODr~FOOD, data=cerere)
+summary(model1i)
+
+model2<-lm(log(PFOODr)~log(FOOD),data=cerere)
+summary(model2)
+a<-exp(model2$coefficients[1])
+a
+#fct este p=255.32*y^(-0.14)
+#reziduri model2
+plot(model2$residuals,type="l",col="magenta")

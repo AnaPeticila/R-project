@@ -1,0 +1,35 @@
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+cerere <- read.csv("cerere.csv", header=TRUE,sep=";",dec=".")
+cerere$PFOODr <- cerere$PFOOD/cerere$PTPE
+attach(cerere)
+
+model4i<-lm(log(PFOODr)~log(FOOD)+DPI, data=cerere)
+summary(model4i)
+#p=265.81*y^0,25
+
+#reziduuri model2
+plot(model4i$residuals, type="l")
+
+pd<- function(y){
+  265.81*y^0.258
+}
+pd(100)
+curve(pd,from=0,to=1000)
+
+model4<-lm(PFOODr~FOOD+DPI, data=cerere)
+summary(model4)
+options(scipen=999)
+a<-exp(model4$coefficients[1])
+a
+#y^D=0,97+0,0008*PFOODr+(-0,0000672)*DPI
+#Coeficientul DPI are valoarea -0,000067, ceea ce înseamnă că la crestererea pretului cu 1%,  venitului disponibil scade cu 0,000067% 
+
+resid<-resid(model4)
+ajustare<-fitted(model4)
+serii<-data.frame(resid,ajustare,FOOD)
+plot.ts(serii,plot.type = "multiple")
+#Observam ca rezidurile sunt foarte mari in anumite zone
+
+#install.packages("scatterplot3d")
+library(scatterplot3d)
+scatterplot3d(PFOODr,DPI,FOOD)

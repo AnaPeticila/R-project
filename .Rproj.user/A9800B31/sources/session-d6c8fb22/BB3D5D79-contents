@@ -1,0 +1,285 @@
+#SEMINAR 3
+#VECTORI
+#a) Generati un vector ce va contine numerele de la 1 la x. Afisati
+#elementul al treilea. Atribuiri de valori, vizualizări de elemente din
+#vector.
+x<-1:50
+x[3]
+x[c(3,5,11)]
+#construiti un vector y pornind de la vectorul x, inlocuind elementele de pe pozitiile 7 si 13 cu 100
+y<-x
+y[c(7,13)]<-100
+
+#MATRICI
+m<-matrix(data=c(10,3,5,1,2,3,31,8,1),nrow=3,ncol=3,byrow=F)
+m[2,3]
+m[2,]
+row.names(m)<-c("r1","r2","r3")
+colnames(m)<-c("c1","c2","c3")
+A<-matrix(m,nrow=3,ncol=3,byrow=F)
+
+
+m[,2]
+coloana2<-m[,2]
+suma<-sum(coloana2)
+patrat<-coloana2^2
+m^2#ridica toata matricea
+m%*%m#patratul matricii
+solve(m)#inversa
+tm<-t(m)#transpusa
+sd(coloana2)#abaterea standard
+matrice<-matrix(10:18,nrow=3,byrow=T)
+produs<-m%*%matrice
+
+#GENERARE VALORI INTRE 0 SI 10 LA O DISTANTA DE 0.5
+s<-seq(from=0, to=10, by=0.5)
+min(s)
+max(s)
+mean(s)
+var(s)
+windows()
+plot(s,type="l",col="lightblue",main="Reprezentare matrice s",ylab="valori",xlab="nr")
+plot(s,type="h",col="lightblue",main="Reprezentare matrice s",ylab="valori",xlab="nr")
+
+#generati n=100 de valori N(m=5,s=1.3)
+n=100
+medie=5
+sd=1.3
+set.seed(1044)
+valori<-rnorm(n,medie,sd)
+mean(valori)
+sd(valori)
+which.min(valori)
+valori[30]
+min(valori)
+valori[valori==min(valori)]
+sortare<-sort(valori,decreasing=TRUE)
+windows()
+plot(sortare, type="h")
+hist(valori,freq=F, col="lightblue",main="Distributie")
+
+#SEMINAR 4
+#Import date in R
+
+#import txt
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+actiuni<-read.table("PFE.txt", header=TRUE, sep="\t", dec=".")
+
+#import csv
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+actiuni2<-read.csv("PFE.csv",header=TRUE, sep=",",dec=".")
+fix(actiuni)
+head(actiuni)
+names(actiuni)
+mean(actiuni$Pret.PFE)
+attach(actiuni)
+mean(Pret.PFE)
+
+#construiti un data frame cu urmatoarele coloane:data, pret PFE si pret S&P
+actiuni_comune<-data.frame(Date,Pret.PFE,Pret.Indice.S.P. )
+actiuni_comune<-actiuni[,c(1,4,5)]
+
+#furnizare statistici descriptive
+summary(actiuni_comune[,-1])
+write.csv(s,"sumamry.csv")
+m<-matrix(c(diff(range(Pret.PFE)),diff(range(Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.)),nrow=2,byrow=TRUE)
+row.names(m)<-c("Amplitudine","abatere standard")
+colnames(m)<-c("Pret PFE","Pret Indice")
+max(Pret.Indice.S.P.)
+Date[which.max(Pret.Indice.S.P.)]
+
+#Reprezentare grafica a evolutiei
+plot(Pret.PFE,Pret.Indice.S.P.)
+ts<-data.frame(Pret.PFE,Pret.Indice.S.P.)
+windows()
+plot.ts(ts,plot.type = "multiple",col="red",main="Reprezentarea grafica a evolutiei preturilor")
+
+#SEMINAR 5-6
+#Analiza preturilor
+par(mfrow=c(2,1))
+hist(Pret.PFE,main="Hist PFE", col="blue")
+hist(Pret.Indice.S.P.,main="Hist S&P",col="lightblue")
+install.packages("moments")
+library(moments)
+#coeficienti de asimetrie
+skewness(Pret.PFE)
+skewness(Pret.Indice.S.P.)
+#coeficienti de aplatizare
+kurtosis(Pret.PFE)
+kurtosis(Pret.Indice.S.P.)
+#matrice de corelatie
+co<-data.frame(Pret.PFE,Pret.Indice.S.P.,Pret.AAPL,Pret.MRK)
+matr_corelatie<-cor(co)
+install.packages("corrplot")
+library(corrplot)
+windows()
+corrplot(matr_corelatie,main="Matrice de corelatie")
+
+R<-cor(actiuni[,-1])
+library(corrplot)
+windows()
+corrplot(R,type="upper", method="ellipse")
+
+#Reprezentare boxplot
+attach(actiuni)
+boxplot(Pret.PFE, horizontal=TRUE)
+install.packages("moments")
+library(moments)
+casSP<-skewness(Pret.Indice.S.P.)
+boxplot(Pret.PFE,horizontal=TRUE)
+casPFE <-skewness(Pret.PFE)
+#quartile
+quantile(Pret.PFE)
+q[3]
+#boxplot si histograme
+windows()
+par(mfrow=c(2,2))
+boxplot(Pret.PFE,horizontal=TRUE, col="red",main="Boxplot PFE")
+hist(Pret.PFE,col="red",main="Hist PFE")
+boxplot(Pret.Indice.S.P.,horizontal=TRUE, col="green",main="Boxplot Indice")
+hist(Pret.Indice.S.P.,col="green",main="Hist Indice")
+#coefi de variatie pusi intr-o matrice
+m<-matrix(c(diff(range(Pret.PFE)),diff(range(Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.)),nrow=2, byrow = T)
+row.names(m)<-c("Amplitudine","sd")
+colnames(m)<-c("Pret PFE","Pret Indice")
+#covarianta
+cvPFE<-100*sd(Pret.PFE)/mean(Pret.PFE)
+cvSP<-100*sd(Pret.Indice.S.P.)/mean(Pret.Indice.S.P.)
+m<-matrix(c(diff(range(Pret.PFE)),diff(range(Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.),cvPFE,cvSP),nrow=3,byrow=T)
+row.names(m)<-c("Amplitudine","sd","cv")          
+colnames(m)<-c("PFE","S&P")
+m
+
+#SEMINAR 7-8
+
+#n=1500 de companii, sectoare de activitate:Agricultura 5%, Industria 35%, Comert 15%, Transporturi 25%, Turism 20%
+#dimensiunea firmei mici 60%, mijlocii 30%, mari 10%
+
+id<-1:1500
+set.seed(1)
+sector<-sample(c("Agr","Ind","Comert","Transport","Turism"),size=1500, replace = TRUE, prob=c(0.05,0.35,0.15, 0.25, 0.20))
+sector<-factor(sector)
+table(sector)
+
+set.seed(2)
+dim<-sample(1:3,size=1500,replace=T, prob=c(0.6,0.3,0.1))
+dim<-factor(dim)
+is.factor(dim)
+table(dim)
+levels(dim)<-c("mici","medii","mari")
+table(dim)
+
+companii<-data.frame(id,sector,dim)
+table(sector, dim)
+
+#generare venit
+#Firme mari N(800000,170000) distributia normala(medie,ab std)
+#Firme medii N(600000,140000)
+#Firme mici N(300000,90000)
+
+#Firme mari
+dfmari<-subset(companii, companii$dim=="mari")
+set.seed(3)
+dfmari$venit<-rnorm(dim(dfmari)[1],800000,170000)
+
+#Firme medii
+dfmedii<-subset(companii, companii$dim=="medii")
+set.seed(4)
+dfmedii$venit<-rnorm(dim(dfmedii)[1],600000,140000)
+
+#Firme mici
+dfmici<-subset(companii,companii$dim=="mici")
+set.seed(5)
+dfmici$venit<-rnorm(dim(dfmici)[1],300000,90000)
+
+#unire data.frameuri
+companii<-rbind(dfmari,dfmedii,dfmici)
+
+#generare investitii
+#investitiile=10000+0.4*venit+eps
+#eps ~ N(0,1)
+
+set.seed(6)
+eps<-rnorm(1500)
+companii$investitii<-1000+0.4*companii$venit+eps
+
+#generare costuri
+#mari ~N(400000,200000)
+#medii ~N(350000,100000)
+#mici ~ N(140000,60000)
+
+set.seed(7)
+companii$costuri<-rep(0,1500)
+companii$costuri[which(companii$dim=="mari")]<-rnorm(dim(dfmari)[1],400000,200000)
+proba<-which(companii$dim=="mari")
+
+set.seed(8)
+companii$costuri[which(companii$dim=="medii")]<-rnorm(dim(dfmedii)[1],350000,100000)
+
+set.seed(9)
+companii$costuri[which(companii$dim=="mici")]<-rnorm(dim(dfmici)[1],140000,60000)
+
+#Cate firme mari sunt in industrie?
+dfmariInd<-subset(companii,companii$dim=="mari" & companii$sector=="Ind")
+dim(dfmariInd)
+
+#calculati media veniturilor pt firmele mici din turism
+dfmicitur<-subset(companii, companii$dim=="mici" & companii$sector=="Turism")
+mean(dfmicitur$venit)
+companii$profit<-companii$venit-companii$investitii
+companii$rent<-companii$profit/companii$venit
+ind<-subset(companii, sector=="Ind")
+mri<-mean(ind$rent)
+sdri<-(ind$rent)
+
+#SEMINAR9
+#Estimare cerere
+#import date csv
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+cerere<-read.csv("cerere.csv",header=TRUE, sep=";",dec=".")
+
+#analiza evolutie FOOD
+attach(cerere)
+serii<-ts(cbind(FOOD,PFOOD),start=1959)
+plot.ts(serii,plot.type = "multiple")
+
+#identificarea anilor care duc la modificari mari ale cererii si pretului
+modifFOOD<-100*diff(FOOD)/FOOD[-45]
+modificari<-data.frame(1960:2003, modifFOOD,modifPFOOD)
+# care este anul in care s- a iregistrat cea mai mare crestere a cererii
+which.max(modificari$modifFOOD)#gaseste pozitia
+modificari[,1][which.max(modificari$modifFOOD)]#extrage anul
+#anii in care cererea a scazut cu peste 1%
+modificari[,1][which(modificari$modifFOOD<(-1))]
+hist(modificari$modifFOOD, main="Grafic pt FOOD", col="blue")
+
+cerere$PFOODr<-cerere$PFOOD/cerere$PTPE
+cvFOOD<-sd(cerere$FOOD)/mean(cerere$FOOD)
+cvPFOODr<-sd(cerere$PFOODr)/mean(cerere$PFOODr)
+
+skewness(cerere$FOOD)
+kurtosis(cerere$FOOD)
+skewness(cerere$PFOODr)
+kurtosis(cerere$PFOODr)
+
+q<-quantile(cerere$FOOD)
+mean(cerere$FOOD)
+q[3] 
+
+windows()
+plot(density(cerere$FOOD),main="Evolutie cerere FOOD", col="green")
+windows()
+boxplot(cerere$FOOD, horizontal = T, main="Evolutie FOOD", col="red")
+hist(cerere$PFOODr, col="lightblue", main="Evolutie cerere PFOODr")
+
+install.packages("moments")
+library(moments)
+skewness(cerere$FOOD)
+
+#outliers
+boxplot(cerere$FOOD, horizontal = T, main="Evolutie FOOD", col="red")$out
+
+#corelatia dintre pret si cerere
+windows()
+plot(cerere$PFOODr,cerere$FOOD, col="pink", main="Corelatie intre pret si cerere")
+abline(lm(cerere$FOOD~cerere$PFOODr),col="lightblue")

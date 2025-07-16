@@ -1,0 +1,97 @@
+
+# Tema --------------------------------------------------------------------
+#import din txt
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+actiuni<-read.table("PFE.txt", header=TRUE,sep="\t",dec=".")
+#import csv
+actiuni2 <-read.csv("PFE.csv",header=TRUE,sep=",",dec=".")
+names(actiuni)
+head(actiuni)
+
+#media
+mean(actiuni$Pret.MRK)
+mean(actiuni$Pret.MSFT)
+
+#abaterea standard
+sd(actiuni$Pret.MRK)
+sd(actiuni$Pret.MSFT)
+
+#coeficient de variatie
+cvMRK <- 100*sd(actiuni$Pret.MRK)/mean(actiuni$Pret.MRK)
+cvMSFT <- 100*sd(actiuni$Pret.MSFT)/mean(actiuni$Pret.MSFT)
+
+cvMRK=10.79026
+cvMSFT=8.290907
+n=100#primele 100 de observatii
+
+valori_cv<-rnorm(n,cvMRK,cvMSFT)
+cv_maxim <- which.max(valori_cv)
+#aflam coeficientul de variatie cel mai mare
+#constatam ca cea mai mare valoare a fost inregistrata de compania Merck
+
+valori_companii <- rnorm(actiuni$Pret.MRK,actiuni$Pret.MSFT)
+sortare_date <- actiuni[order(valori_cv), ]
+
+#data frame cu cele 100 de observatii
+data_frame1 <- data.frame(sortare_date)
+data_frame100<- head(data_frame1, n = 100)
+
+#reprezentare grafica a evolutiilor
+library(corrplot)
+evolutii<-cor(data_frame100[,-1])
+corrplot(evolutii,type="upper",method="color")
+
+library(corrplot)
+plot(actiuni$Pret.MRK,type="l",main="Evoluția prețului Merck")
+p<-data.frame(sortare_date)
+
+library(corrplot)
+plot(actiuni$Pret.MSFT,type="l",main="Evoluția prețului Microsoft")
+p<-data.frame(sortare_date)
+
+#histograme
+hist(evolutii, col="lightblue", main="Histograma", ylab="Frecventa", xlab="Valoarea")
+hist(actiuni$Pret.MRK, col="lightblue", main="Histograma", ylab="Frecventa", xlab="Valoarea")
+hist(actiuni$Pret.MSFT, col="lightblue", main="Histograma", ylab="Frecventa", xlab="Valoarea")
+
+#boxploturi
+boxplot(evolutii, col="lightpink", main="Boxplot", horizontal = TRUE)
+boxplot(actiuni$Pret.MRK, col="lightpink", main="Boxplot", horizontal = TRUE)
+boxplot(actiuni$Pret.MSFT, col="lightpink", main="Boxplot", horizontal = TRUE)
+
+#coeficienti de asimetrie
+library(moments)
+skewness(actiuni$Pret.MRK)
+skewness(actiuni$Pret.MSFT)
+skewness(evolutii)
+
+#coeficienti de aplatizare
+kurtosis(actiuni$Pret.MRK)
+kurtosis(actiuni$Pret.MSFT)
+kurtosis(evolutii)
+
+#coeficient de variatie
+cvMRK <- 100*sd(actiuni$Pret.MRK)/mean(actiuni$Pret.MRK)
+cvMSFT <- 100*sd(actiuni$Pret.MSFT)/mean(actiuni$Pret.MSFT)
+
+#matrice
+m <- matrix(c(skewness(actiuni$Pret.MRK),skewness(actiuni$Pret.MSFT),kurtosis(actiuni$Pret.MRK),kurtosis(actiuni$Pret.MSFT),cvMRK<-(100*sd(actiuni$Pret.MRK)/mean(actiuni$Pret.MRK)),cvMSFT<-(100*sd(actiuni$Pret.MSFT)/mean(actiuni$Pret.MSFT))),nrow=2,byrow=T)
+row.names(m) <- c("MRK","MSFT")
+colnames(m) <- c("sk","kurt","cv")
+
+#Interpretare
+#Dupa ce am calculat coeficientul de variatie putem observa ca cea mai mare valoare a fost inregistrata de catre compania farmaceutica Merck.
+#Acest lucru ne arata ca exista o variatie relativ mare a datelor in raport cu media.
+#Cand CV(coeficient de variatie) inregistreaza o valoare intre 10%-30% este considerat moderat.
+#Pentru compania Microsoft, coeficientul de variatie are valoarea de 8.2909, ceea ce ne arata ca exista o variatie relativ mare a preturilor, la fel ca si in cazul companiei Merck.
+#Coeficientul de asimetrie al companiei Merck a inregistrat valoarea de 0.3863, ceea ce indica o usoare asimetrie pozitiva, adica valorile inregistrate tind spre partea dreapta a graficului.
+#Acest lucru sugereaza faptul ca Merck a inregistrat mai des valori mari, distributia datelor fiind relativ simetrica.
+#Coeficientul de asimetrie al companiei Microsoft a inregistrat valoarea de 0.4646, fiind tot o asimetrie extinsa spre dreapta la fel ca in cazul companiei Merck.
+#Intre coeficientii de asimetrie inregistrati de cele doua companii nu exista diferente mari.
+#Coeficientul de aplatizare inregistrat de compania Merck are valoarea pozitiva de 1.9242, ceea ce ne arata ca distributia are o aplatizare mai mare decat cea normala.
+#O valoare ridicata a coeficientului kurtosis indica faptul ca au fost inregistrate valori extreme fata de o distributie normala.
+#Coeficientul de aplatizare inregistrat de compania Microsoft are valoarea de 2.5904, fiind o aplatizare mult mai mare decat in cazul companiei Merck.
+#Aceasta valoare indica o distributie mult mai mare in care au fost inregistrate multe valori extreme.
+#In graficul cu evolutia preturilor companiei Merck observam ca in ultimii ani a existat o crestere constanta. Un factor care a declansat aceasta crestere este pandemia de COVID-19.
+#In graficul cu evolutia preturilor companiei Microsoft se poate observa o scadere a preturilor in ultimii ani.
+

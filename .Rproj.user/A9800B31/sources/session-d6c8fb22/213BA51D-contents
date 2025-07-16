@@ -1,0 +1,90 @@
+#problema 1
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+d<-read.csv("PFE.csv",header = TRUE,sep=",",dec=".")
+date_alese<-d[219:318,]
+data_framepeti<-date_alese[,-1]
+#pas1
+names(d)
+dt<-data.frame(Pret.Indice.S.P.,Pret.MRK,Pret.AAPL)
+matriceCorelatie<-cor(dt)
+library(corrplot)
+windows()
+corrplot(matriceCorelatie)
+#matricea de corelatie ne arata faptul ca variabilele pret sunt puternic corelate deoarece coef de variatie au valori ridicate,
+#lucru care ne arata ca exista o piata cu concurenta puternica in care firmele tin cont de preturile celorlalte companii de pe piata
+
+#pas2
+windows()
+plot(Pret.Indice.S.P.,col="lightblue",main="Grafic s&p",type="l")
+plot(Pret.MRK,col="pink",main="Grafic MRK",type="l")
+plot(Pret.AAPL,col="purple",main="Grafic AAPL",type="l")
+#Graficul realizat pentru indicele de piata ne arata ca a avut oscilatii semnificative, aflandu-se intro-crestere 
+#Graficul pretului companiei Merck ne indica faptul ca s-a aflat intr-o usoara cerstere de a-lungul timpului,dar
+#a avut si scaderi ale pretului ajungand chiar sub 90 de dolari, cea mai mare crestere a fost de aprox 120 de dolari
+#Graficul companiei Apple arata ca au existat fluctuatii mari, avand un trend ascendent in prima parte a analizei,
+#dar s-au inregistrat si scaderi ale acestuia
+
+#pas3
+windows()
+par(mfrow=c(3,3))
+plot(density(Pret.Indice.S.P.),col="lightblue",main="densitati de probabilitate s&p")
+plot(density(Pret.MRK),col="pink",main="densitati de probabilitate MRK")
+plot(density(Pret.AAPL),col="purple",main="densitati de probabilitate AAPL")
+boxplot(Pret.Indice.S.P.,horizontal = T,col="lightblue",main="boxplot s&p")
+boxplot(Pret.MRK,horizontal = T,col="pink",main="boxplot MRK")
+boxplot(Pret.AAPL,horizontal = T,col="purple",main="boxplot AAPL")
+#outliers
+windows()
+par(mfrow=c(3,1))
+boxplot(Pret.Indice.S.P.,horizontal = T,col="lightblue",main="boxplot s&p")$out
+boxplot(Pret.MRK,horizontal = T,col="pink",main="boxplot MRK")$out
+boxplot(Pret.AAPL,horizontal = T,col="purple",main="boxplot AAPL")$out
+#coef de asimetrie
+library(moments)
+skewness(Pret.Indice.S.P.)
+skewness(Pret.MRK)
+skewness(Pret.AAPL)
+#coef de aplatizare
+kurtosis(Pret.Indice.S.P.)
+kurtosis(Pret.MRK)
+kurtosis(Pret.AAPL)
+
+#pas4
+q2<-quantile(Pret.MRK)
+q1MRK<-q2[2]
+q2MRK<-q2[3]
+qconcatMRK<-c(q1MRK,q2MRK)
+q3<-quantile(Pret.AAPL)
+q1AAPL<-q3[2]
+q2AAPL<-q3[3]
+qconcatAAPL<-c(q1AAPL,q2AAPL)
+qconcat<-c(qconcatMRK,qconcatAAPL)
+zile_date<-Date[which(Pret.MRK<qconcat)]
+
+#problema2
+id<-1:287
+set.seed(1)
+tari<-sample(c("Franta","Italia","Spania"),replace=TRUE, size=287, prob=c(0.16,0.35,0.49))
+tari<-factor(tari)
+set.seed(2)
+dom<-sample(c("fashion","beauty"),replace=TRUE,size=287,prob=c(0.1,0.9))
+dom<-factor(dom)
+f<-data.frame(id,tari,dom)
+set.seed(3)
+outfash<-subset(f,f$dom=="fashion")
+outputbeauty<-subset(f,f$dom=="beauty")
+set.seed(4)
+outfash$output<-rnorm(dim(outfash)[1],18592,0.42*18592)
+outputbeauty$output<-rnorm(dim(outputbeauty)[1],6474,0.34*6474)
+e<-rnorm(287,80,15)
+f<-rbind(outfash,outputbeauty)
+set.seed(5)
+f$venit<-9*(f$output)^2+2.5*9*(f$output)+e
+set.seed(6)
+f$investitii<-0.3*(f$venit)
+set.seed(7)
+f$costuri<-0.27*(f$venit)
+set.seed(8)
+f$profit<-f$venit-f$costuri
+set.seed(9)
+attach(f)

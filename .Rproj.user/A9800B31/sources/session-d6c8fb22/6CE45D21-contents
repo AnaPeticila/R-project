@@ -1,0 +1,67 @@
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+cerere<-read.csv("cerere.csv",header = T,sep = ";",dec = ".")
+serii<-ts(cbind(FOOD,PFOOD),start=1959)
+windows()
+plot.ts(serii, plot.type = "multiple",col="lightblue",main="Evolutia preturilor")
+attach(cerere)
+modifFOOD<-100*diff(FOOD)/FOOD[-45]
+modifPFOOD<-100*diff(PFOOD)/PFOOD[-45]
+modificari<-data.frame(1960:2003,modifFOOD,modifPFOOD)
+which.max(modificari$modifFOOD)
+modificari[,1][which.max(modificari$modifFOOD)]
+modificari[,1][which(modificari$modifFOOD<(-1))]
+hist(modificari$modifFOOD,col="blue",main="Modificarile preturilor")
+
+cerere$PFOODr<-cerere$PFOOD/cerere$PTPE
+mean(cerere$FOOD)
+mean(cerere$PFOODr)
+sd(cerere$FOOD)
+sd(cerere$PFOODr)
+cvFOOD<-sd(cerere$FOOD)/mean(cerere$FOOD)
+cvPFOODr<-sd(cerere$PFOODr)/mean(cerere$PFOODr)
+summary(cerere$PFOODr)
+summary(cerere$FOOD)
+q<-quantile(cerere$FOOD)
+q[3]
+#coef de asimetrie
+skewness(cerere$FOOD)
+skewness(cerere$PFOODr)
+#coef de aplatizare
+kurtosis(cerere$FOOD)
+kurtosis(cerere$PFOODr)
+plot(density(cerere$PFOODr),col="blue",main="evolutie pret real")
+plot(density(cerere$FOOD),col="blue",main="evolutie cerere")
+windows()
+par(mfrow=c(2,2))
+boxplot(cerere$FOOD,horizontal = T, col="green",main="boxplot alimente")
+hist(cerere$FOOD,col = "blue",main="hist alimente")
+boxplot(cerere$PFOODr,horizontal = T, col="green",main="boxplot alimente")
+hist(cerere$PFOODr,col = "blue",main="hist alimente")
+boxplot(cerere$FOOD,horizontal = T, col="green",main="boxplot alimente")$out
+boxplot(cerere$PFOODr,horizontal = T, col="green",main="boxplot alimente")$out
+windows()
+plot(cerere$PFOODr,cerere$FOOD, col="pink",main="Corelatia dintre pret si cerere")
+abline(lm(cerere$FOOD~cerere$PFOODr),col="lightblue")
+cor(FOOD,PFOODr)
+windows()
+par(mforw=c(1,1))
+plot(cerere$PFOODr,cerere$FOOD,col="purple")
+abline(lm(FOOD~PFOODr,data=cerere),col="yellow")
+model1<-lm(FOOD~PFOODr,data=cerere)
+summary(model1)
+attach(cerere)
+cerere$PFOODr<-100*PFOOD/PTPE
+model1$coefficients
+confint(model1)
+r<-residuals(model1)
+r<-model1$residuals
+cerereEstimata<-model1$fitted.values
+hist(r)
+plot(r,type="l")
+model1i<-lm(PFOODr~FOOD,data=cerere)
+summary(model1i)
+model2<-lm(log(PFOODr)~log(FOOD),data=cerere)
+summary(model2)
+a<-exp(model2$coefficients[1])
+r2<-model2$residuals
+plot(r2,type="l")

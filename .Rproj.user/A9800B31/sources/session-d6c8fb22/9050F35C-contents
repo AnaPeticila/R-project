@@ -1,0 +1,1 @@
+index_tara <- sample(c("Franta", "Germania", "Italia"), size = N, replace = TRUE, prob = c(p1, p2, p3))

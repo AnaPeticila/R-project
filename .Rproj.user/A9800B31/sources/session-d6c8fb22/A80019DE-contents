@@ -1,0 +1,118 @@
+#problema1
+setwd("D:\\Materii ANUL 2 SEM 2\\MICRO MANAGERIALA\\TEST 1047")
+dateTeste<-read.csv("dateTest.csv",header = TRUE,sep=";",dec=".")
+date_32<-dateTeste[219:318,]
+data_peti<-date_32[,-1]
+
+attach(date_32)
+plot.ts(IndiceNasdaq,col="pink")
+plot.ts(ILMN,col="purple")
+plot.ts(PYP,col="yellow")
+
+matrice_corelatie<-cor(data_peti)
+library(corrplot)
+corrplot(matrice_corelatie)
+
+windows()
+par(mfrow=c(3,3))
+plot(density(IndiceNasdaq),col="pink",main="dens de prob indice")
+plot(density(ILMN),col="purple",main="dens de prob ILMN")
+plot(density(PYP),col="yellow",main="dens de prob PYP")
+boxplot(IndiceNasdaq,col="pink",main="boxplot indice")
+boxplot(ILMN,col="purple",main="boxplot ILMN")
+boxplot(PYP,col="yellow",main="boxplot PYP")
+
+#coef de asimetrie
+skewness(IndiceNasdaq)
+skewness(ILMN)
+skewness(PYP)
+#coef de boltire
+kurtosis(IndiceNasdaq)
+kurtosis(ILMN)
+kurtosis(PYP)
+
+zile_dateIndice<-Date[which(IndiceNasdaq>mean(IndiceNasdaq)+3*sd(IndiceNasdaq))]
+zile_dateCompanie<-Date[which(PYP>mean(PYP)+3*sd(PYP))]
+
+#Problema2
+#N=287
+id<-1:287
+set.seed(1)
+judet<-sample(c("Timis","Ilfov","Suceava"),replace=TRUE,size=287,prob = c(0.16,0.35,0.49))
+judet<-factor(judet)
+set.seed(2)
+domeniile<-sample(c("industrie","transporturi"),size=287,replace=TRUE,prob = c(0.1,0.9))
+domeniile<-factor(domeniile)
+
+comp<-data.frame(id,judet,domeniile)
+set.seed(3)
+
+opInd<-subset(comp,comp$domeniile=="industrie")
+opTransp<-subset(comp,comp$domeniile=="transporturi")
+set.seed(4)
+opInd$output<-rnorm(dim(opInd)[1],18592,1.5*18592)
+opTransp$output<-rnorm(dim(opTransp)[1],6474,0.25*6474)
+e<-rnorm(287,10,2)
+comp<-rbind(opInd,opTransp)
+set.seed(5)
+comp$venit<-1.2*9*(comp$output)^2+2*(comp$output)+e
+set.seed(6)
+comp$cost<-6/16*(comp$venit)
+set.seed(7)
+comp$profit<-comp$venit-comp$cost
+set.seed(8)
+comp$rent<-comp$profit/comp$venit
+attach(comp)
+costuri_ind<-subset(comp[,6],comp$domeniile=="industrie")
+costuri_transp<-subset(comp[,6],comp$domeniile=="transporturi")
+rentabilitate_ind<-subset(comp[,8],comp$domeniile=="industrie")
+rentabilitate_transp<-subset(comp[,8],comp$domeniile=="transporturi")
+hist(comp$cost,col="pink",main = "hist costuri totale")
+hist(comp$rent,col="purple",main = "hist rent totale")
+plot(costuri_ind,col="pink",main = "costuri ind")
+plot(costuri_transp,col="pink",main="costuri transp")
+plot(rentabilitate_ind,col="purple",main="rentabilitate industrie")
+plot(rentabilitate_transp,col="purple",main="rentabilitate transp")
+
+matriceTest<-matrix(ncol=2,nrow=4)
+firme<-subset(comp,comp$judet=="Timis")
+rentabilitateTimis<-firme[,8]
+
+firme2<-subset(comp,comp$domeniile=="industrie")
+rentabilitateind<-firme2[,8]
+
+q3T<-quantile(rentabilitateTimis)
+q3T[4]
+medianaT<-median(rentabilitateTimis)
+medieT<-mean(rentabilitateTimis)
+cvT<-sd(rentabilitateTimis)/mean(rentabilitateTimis)
+
+q3I<-quantile(rentabilitateind)
+medianaI<-median(rentabilitateind)
+medieI<-mean(rentabilitateind)
+cvI<-sd(rentabilitateind)/mean(rentabilitateind)
+
+matriceTest<-c(q3T,medianaT,medieT,cvT,q3I,medianaI,medieI,cvI)
+colnames(matriceTest)<-c("rentabilitateTimis","rentabilitateIndustrie")
+rownames(matriceTest)<-c("Q3","Mediana","Medie","CV")
+matriceTest[,1]<-c(q3T[4],medianaT,medieT,cvT)
+matriceTest[,2]<-c(q3I[4],medianaI,medieI,cvI)
+matriceTest
+
+firme_transpTimis<-subset(comp,comp$judet=="Timis"&comp$domeniile=="transporturi")
+firme_transpIlfov<-subset(comp,comp$judet=="Ilfov"&comp$domeniile=="transporturi")
+firme_transpSuceava<-subset(comp,comp$judet=="Suceava"&comp$domeniile=="transporturi")
+
+medieFirmeTranspTimis<-mean(firme_transpTimis$profit)
+medieFirmeTranspIlfov<-mean(firme_transpIlfov$profit)
+medieFirmeTranspSuceava<-mean(firme_transpSuceava$profit)
+
+abatereFirmeTranspTimis<-sd(firme_transpTimis$profit)
+abatereFirmeTranspIlfov<-sd(firme_transpIlfov$profit)
+abatereFirmeTranspSuceava<-sd(firme_transpSuceava$profit)
+
+firme_transpTimis[,1][which(firme_transpTimis$profit<(medieFirmeTranspTimis-2*abatereFirmeTranspTimis)|firme_transpTimis$profit>(medieFirmeTranspTimis+2*abatereFirmeTranspTimis))]
+
+firme_transpIlfov[,1][which(firme_transpIlfov$profit<(medieFirmeTranspIlfov-2*abatereFirmeTranspIlfov)|firme_transpIlfov$profit>(medieFirmeTranspIlfov+2*abatereFirmeTranspIlfov))]
+
+firme_transpSuceava[,1][which(firme_transpSuceava$profit<(medieFirmeTranspSuceava-2*abatereFirmeTranspSuceava)|firme_transpSuceava$profit>(medieFirmeTranspSuceava+2*abatereFirmeTranspSuceava))]

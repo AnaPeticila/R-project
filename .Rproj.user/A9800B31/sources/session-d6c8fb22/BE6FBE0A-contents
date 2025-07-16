@@ -1,0 +1,3 @@
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+datebursa<-read.csv("PFE.csv",header = TRUE,sep=",",dec=".")
+date_selectate<-datebursa[219:318,]

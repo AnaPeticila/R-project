@@ -1,0 +1,137 @@
+#Problema 1
+#Pas 1
+setwd("D:\\Materii ANUL 2 SEM 2\\MICRO MANAGERIALA\\TEST 1047")
+date<-read.csv("dateTest.csv",header = TRUE, sep=";",dec=".")
+date_32<-date[219:318,]
+data_frame_peti<-date_32[,-1]
+#reprezentare grafica
+attach(date_32)
+plot.ts(IndiceNasdaq,col="lightblue")
+plot.ts(ILMN,col="purple")
+plot.ts(PYPL,col="pink")
+
+#pas2
+matrice_corelatie<-cor(data_frame_peti)
+install.packages("corrplot")
+library(corrplot)
+corrplot(matrice_corelatie)
+#variabilele pret sunt puternic coreplate deoarece coef de var este mai mare de 75%
+#se poate deduce faptul ca piata este una cu concurenta puternica in care firmele tin cont una de preturile celeilalte
+#(0.77 intre ILMN si PYPL si 0.88 intre firme si indicele de piata)
+
+#pas3
+windows()
+par(mforw=c(3,3))
+plot(density(InidiceNasdaq),col="lightblue",main="Denistatile de probabilitate indice de piata")
+plot(density(ILMN),col="purple",main="Denistatile de probabilitate ILMN")
+plot(density(PYP),col="pink",main="Denistatile de probabilitate PYP")
+boxplot(InidiceNasdaq,horizontal=TRUE,col="lightblue",main="boxplot Nasdaq")
+boxplot(ILMN,horizontal=TRUE,col="purple",main="boxplot ILMN")
+boxplot(PYP, horizontal=TRUE, col="pink",main="boxplot PYP")
+#outlieri
+boxplot(InidiceNasdaq,horizontal=TRUE,col="lightblue",main="boxplot Nasdaq")$out
+boxplot(ILMN,horizontal=TRUE,col="purple",main="boxplot ILMN")$out
+boxplot(PYP, horizontal=TRUE, col="pink",main="boxplot PYP")$out
+
+library(moments)
+#coef de asimetrie
+skewness(InidiceNasdaq)
+skewness(ILMN)
+skewness(PYP)
+#coef de aplatizare
+kurtosis(IndiceNasdaq)
+kurtosis(ILMN)
+kurtosis(PYP)
+
+#pas4
+#prag medie+3*abatere std
+zile_dateIndice<-Date[which(IndiceNasdaq>mean(IndiceNasdaq)+3*sd(IndiceNasdaq))]
+zile_dateCompanie<-Date[which(PYP>mean(PYP)+3*sd(PYP))]
+
+#Problema 2
+#N=287
+id<-1:287
+set.seed(1)
+judete<-sample(c("Timis","Ilfov","Suceava"),size=287,replace=TRUE,prob = c(0.16,0.35,0.49))
+judete<-factor(judete)
+
+set.seed(2)
+domenii<-sample(c("industrie","transporturi"),replace=TRUE,size=287,prob = c(0.1,0.9))
+domenii<-factor(domenii)
+
+companie<-data.frame(id,judete,domenii)
+set.seed(3)
+
+outputind<-subset(companie,companie$domenii=="industrie")
+set.seed(4)
+outputtransp<-subset(companie,companie$domenii=="transporturi")
+
+outputind$output<-rnorm(dim(outputind)[1],18592,1.5*18592)
+outputtransp$output<-rnorm(dim(outputtransp)[1],6474,0.25*6474)
+e<-rnorm(287,10,2)
+companie<-rbind(outputind,outputtransp)
+
+set.seed(5)
+companie$venit<-1.2*9*(companie$output)^2+2*(companie$output)+e
+
+set.seed(6)
+companie$cost<-6/16*companie$venit
+
+set.seed(7)
+companie$profit<-companie$venit-companie$cost
+
+set.seed(8)
+companie$rent<-companie$profit/companie$venit
+attach(companie)
+costuriInd<-subset(companie[,6],companie$domenii=="industrie")
+costuriTransp<-subset(companie[,6],companie$domenii=="transporturi")
+rentabilitatiInd<-subset(companie[,8],companie$domenii=="industrie")
+rentabilitatiTransp<-subset(companie[,8],companie$domenii=="transporturi")
+#pas1
+hist(companie$cost,main="distributie costuri totale",col="lightblue")
+hist(companie$rent,main="distributie rentabilitati totale",col="pink")
+plot(companie$cost,type="l")
+plot(costuriInd,main="distributie costuri industrie",col="lightblue",type="l")
+plot(costuriTransp,main="distributie costuri transport",col="lightblue",type="l")
+plot(rentabilitatiInd,main="distributie rentabilitati industrie",col="pink",type="l")
+plot(rentabilitatiTransp,main="distributie rentabilitati transporturi",col="pink",type="l")
+
+#pas2
+firmeTimis<-subset(companie,companie$judete=="Timis")
+rata_rentabilitate_Timis<-firmeTimis[,8]
+q3Timis<-quantile(rata_rentabilitate_Timis)
+medianaTimis<-median(rata_rentabilitate_Timis)
+medieTimis<-mean(rata_rentabilitate_Timis)
+cvTimis<-sd(rata_rentabilitate_Timis)/mean(rata_rentabilitate_Timis)
+
+firmeInd<-subset(companie,companie$domenii=="industrie")
+rata_rentabilitate_Ind<-firmeInd[,8]
+q3Ind<-quantile(rata_rentabilitate_Ind)
+q3Ind[3]
+medianaInd<-median(rata_rentabilitate_Ind)
+medieInd<-mean(rata_rentabilitate_Ind)
+cvInd<-sd(rata_rentabilitate_Ind)/mean(rata_rentabilitate_Ind)
+
+matrice<-matrix(ncol=2,nrow=4)
+matrice[,1]<-c(q3Timis[4],medianaTimis,medieTimis,cvTimis)
+matrice[,2]<-c(q3Ind[4],medianaInd,medieInd,cvInd)
+colnames(matrice)<-c("Rent Timis","Rent Industrie")
+row.names(matrice)<-c("Q3","Mediana","Medie","CV")
+
+#pas3
+firme_transporturi_Timis<-subset(companie,companie$domenii=="transporturi"&companie$judete=="Timis")
+firme_transporturi_Ilfov<-subset(companie,companie$domenii=="transporturi"&companie$judete=="Ilfov")
+firme_transporturi_Suceava<-subset(companie,companie$domenii=="transporturi"&companie$judete=="Suceava")
+
+medie_firme_transporturi_Timis<-mean(firme_transporturi_Timis$profit)
+medie_firme_transporturi_Ilfov<-mean(firme_transporturi_Ilfov$profit)
+medie_firme_transporturi_Suceava<-mean(firme_transporturi_Suceava$profit)
+
+abatere_standard_firme_transporturi_Timis<-sd(firme_transporturi_Timis$profit)
+abatere_standard_firme_transporturi_Ilfov<-sd(firme_transporturi_Ilfov$profit)
+abatere_standard_firme_transporturi_Suceava<-sd(firme_transporturi_Suceava$profit)
+
+firme_transporturi_Timis[,1][which(firme_transporturi_Timis$profit<(medie_firme_transporturi_Timis-2*abatere_standard_firme_transporturi_Timis)|firme_transporturi_Timis$profit>(medie_firme_transporturi_Timis+2*abatere_standard_firme_transporturi_Timis))]
+firme_transporturi_Ilfov[,1][which(firme_transporturi_Ilfov$profit<(medie_firme_transporturi_Ilfov-2*abatere_standard_firme_transporturi_Ilfov)|firme_transporturi_Ilfov$profit>(medie_firme_transporturi_Ilfov+2*abatere_standard_firme_transporturi_Ilfov))]
+firme_transporturi_Suceava[,1][which(firme_transporturi_Suceava$profit<(medie_firme_transporturi_Suceava-2*abatere_standard_firme_transporturi_Suceava)|firme_transporturi_Suceava$profit>(medie_firme_transporturi_Suceava+2*abatere_standard_firme_transporturi_Suceava))]
+

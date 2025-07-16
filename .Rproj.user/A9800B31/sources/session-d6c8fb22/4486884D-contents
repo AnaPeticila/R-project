@@ -1,0 +1,19 @@
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+
+#actiuni<-read.csv("PFE.csv", head=TRUE, sep=",", dec=".")
+
+#actiuni_comune<-data.frame(actiuni$Pret.PFE,actiuni$Pret.Indice.S.P.)
+
+vector<-actiuni$Pret.PFE
+mean(actiuni$Pret.PFE)
+
+medie_actiune_pret_PFE<-mean(actiuni$Pret.PFE) 
+vector_nou<-numeric()
+
+for(i in 1:length(vector)) 
+{
+  if (vector[i] > medie_actiune_pret_PFEx) {
+    vector_nou <- c(vector_nou, vector[i])  
+  }
+}
+vector_nou

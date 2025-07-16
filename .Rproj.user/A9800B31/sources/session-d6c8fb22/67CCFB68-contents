@@ -1,0 +1,13 @@
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+date_bursa<-read.csv("PFE.csv",header=TRUE, sep=",",dec=".")
+date_32<-date_bursa[219:318,]
+
+names(date_bursa)
+plot(Pret.PFE, col="pink",main="grafic PFE",type="l")
+plot(Pret.AAPL, col="purple",main="grafic AAPL",type="l")
+plot(Pret.Indice.S.P., col="yellow",main="grafic SP",type="l")
+
+matrice_corelatie<-cor(data_frame_peti)
+library(corrplot)
+corrplot(matrice_corelatie)
+

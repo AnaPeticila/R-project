@@ -1,0 +1,137 @@
+#Test
+
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+preturi<-read.csv("Preturi.csv",header = TRUE,sep=",",dec=".")
+preturi_selectate<-preturi[87:186,]
+data_frame<-preturi_selectate[,-1]
+#Pas1
+attach(preturi_selectate)
+names(preturi_selectate)
+#windows()
+plot(Pret_V,col="pink",type="l")
+plot(Pret_MA,col="purple",type="l")
+plot(Pret_DJIA,col="yellow",type="l")
+#din garficul realizat pentru pretul V putem observa un trend ascendent, fiind inregistrate si scaderi ale acestuia
+#graficul pentru pretul MA indica faptul ca au existat fluctuatii ale acestuia
+#garficul pentru pretul DJIA ne indica la fel ca si in cazul pretului MA faptul ca au existat oscilatii mari ale trendului
+
+#pas2
+matrice_corelatie<-cor(data_frame)
+library(corrplot)
+corrplot(matrice_corelatie)
+#din matricea de corelatie putem observa ca exista o corelatie puternica intre preturi
+
+#pas3
+windows()
+par(mfrow=c(3,3))
+plot(density(Pret_V),col="pink",main="Densitati de probabilitate pret V",type="l")
+plot(density(Pret_MA),col="purple",main="Densitati de probabilitate pret MA",type="l")
+plot(density(Pret_DJIA),col="yellow",main="Densitati de probabilitate indice DJIA",type="l")
+boxplot(Pret_V,horizontal = TRUE,col="pink",main="boxplot pret V")$out
+boxplot(Pret_MA,horizontal = TRUE,col="purple",main="boxplot pret MA")$out
+boxplot(Pret_DJIA,horizontal = TRUE,col="yellow",main="boxplot indice DJIA")$out
+
+#coeficient de asimetrie
+library(moments)
+skewness(Pret_V)
+skewness(Pret_MA)
+skewness(Pret_DJIA)
+#coef de boltire
+kurtosis(Pret_V)
+kurtosis(Pret_MA)
+kurtosis(Pret_DJIA)
+#Coeficientii de asimetrie sunt negativi ceea ce indica faptul ca atat cele doua preturi cat si indicele au o asimetrie spre stanga,
+#distributia are valori mai mici decat media, lucru care se vede si din densitatile de probabilitate
+#coeficientii de aplatizare sunt putin mai mici decat valoarea de referinta care este 3 si anume 2.304 pentru pretul V,
+#2.357 pentru pretul MA si 2.130 pentru indice, acest lucru sugereaza ca distributia este platocurtica
+#Boxplotul de la pretul V este orientat spre dreapta, ceea ce inseamna ca are o asimetrie de stanga si nu prezinta outlieri
+#Boxplotul pretului MA este orientat aproape simetric, dar prezinta o usoara asimetrie spre stanga si nu are outlieri
+#Boxplotul indicelui este orientat spre stanga si prezinta o asimetrie de dreapta, fara outlieri
+#lipsa de outlieri arata faptul ca nu au existat evenimente economice care sa duca la o modificare semnificativa atat a celor doua preturi,
+#cat si a indicelui de piata
+
+#pas 4
+
+
+
+
+#Problema 2
+id<-1:310
+set.seed(1)
+orase<-sample(c("Bucuresti","Ploiesti","Brasov"),size=310,replace=TRUE)
+orase<-factor(orase)
+
+set.seed(2)
+domenii<-sample(c("financiar","constructii"),size=310,replace=T,prob = c(0.27,0.33))
+domenii<-factor(domenii)
+
+companii<-data.frame(id,orase,domenii)
+set.seed(3)
+
+outputFinanciar<-subset(companii,companii$domenii=="financiar")
+set.seed(4)
+outputConstructii<-subset(companii,companii$domenii=="constructii")
+
+outputFinanciar$output<-rnorm(dim(outputFinanciar),38030,38030/120)
+outputConstructii$output<-rnorm(dim(outputConstructii),32894,32894/125)
+e<-rnorm(310,10,3.5)
+companii<-rbind(outputFinanciar,outputConstructii)
+set.seed(5)
+
+companii$costuri<-8*(companii$output)^2+3*(companii$output)+e
+set.seed(6)
+companii$venit<-e*companii$costuri
+set.seed(7)
+companii$profit<-companii$venit-companii$costuri
+set.seed(8)
+companii$rent<-companii$profit/companii$venit
+set.seed(9)
+
+#pas 1
+hist(companii$venit,col="pink",main="histograma venit total")
+hist(companii$rent,col="purple",main="histograma rentabilitate ")
+venit_firme_financiar<-subset(companii[,6],companii$domenii=="finaciar")
+venit_firme_constructii<-subset(companii[,6],companii$domenii=="constructii")
+rent_firme_finaciar<-subset(companii[,8],companii$domenii=="financiar")
+rent_firme_constructii<-subset(companii[,8],companii$domenii=="constructii")
+#hist(venit_firme_financiar,col="pink",main="histogramafinanciar")
+#hist(venit_firme_constructii,col="pink",main="histograma  constructii")
+#hist(rent_firme_finaciar,col="blue",main="histograma rent financiar")
+#hist(rent_firme_constructii,col="blue",main="histograma rent constructii")
+#histograma venitului din cele doua domenii ne arata ca acestea oscileaza puternic, iar rentabilitatea este constanta
+
+#pas2
+firme_bucuresti<-subset(companii,companii$orase=="Bucuresti")
+profit_firme_bucuresti<-firme_bucuresti[,8]
+q<-quantile(profit_firme_bucuresti)
+q1<-q[2]
+q3<-q[4]
+medianaB<-median(profit_firme_bucuresti)
+cvB<-sd(profit_firme_bucuresti)/mean(profit_firme_bucuresti)
+
+firme_brasov<-subset(companii,companii$orase=="Brasov")
+profit_firme_brasov<-firme_brasov[,8]
+q<-quantile(profit_firme_brasov)
+q1Bv<-q[2]
+q3Bv<-q[4]
+medianaBv<-median(profit_firme_brasov)
+cvBv<-sd(profit_firme_brasov)/mean(profit_firme_brasov)
+
+matrice<-matrix(nrow=2,ncol = 4)
+row.names(matrice)<-c("Profit firme Bucuresti","Profit firme Brasov")
+colnames(matrice)<-c("Q25","Q75","Mediana","Cv")
+
+matrice<-matrix(c(q1,q3,medianaB,cvB,q1Bv,q3Bv,medianaBv,cvBv),nrow=2,ncol=4)
+row.names(matrice)<-c("Profit firme Bucuresti","Profit firme Brasov")
+colnames(matrice)<-c("Q25","Q75","Mediana","Cv")
+#diferenta dintre profitul inregistrat in bucuresti si cel inregistrat in brasov nu este foarte mare
+
+#pas 3
+firme_fin_b<-subset(companii,companii$orase=="Bucuresti"&companii$domenii=="financiar")
+firme_fin_p<-subset(companii,companii$orase=="Ploiesti"&companii$domenii=="financiar")
+cost_firme_fin_b<-firme_fin_b[,5]
+cost_firme_fin_p<-firme_fin_p[,5]
+mediana_b<-median(cost_firme_fin_b)
+mediana_p<-median(cost_firme_fin_p)
+
+#firme_fin_b[1][which(firme_fin_b$cost>meadian_b)]

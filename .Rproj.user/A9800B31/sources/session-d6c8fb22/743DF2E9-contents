@@ -1,0 +1,135 @@
+#Problema 2
+#N companii din trei tari(FRANTA, GERMANIA, ITALIA) in proportii de p1,p2,p3
+#domenii fashion si automobile proportii de la 1 la x
+#costuri totale=1.5*x*output^2+1.2*output+e
+#output medie m1, abatere std 150% *m1 pt fashion
+#output medie m2, ab std 75%*m2 pt auto
+#e medie=20, ab std=4
+#profituri totale 3.2*costuri totale
+
+#Rezolvare
+#Inițializăm variabilele necesare:
+N <- 100  # Numărul de companii
+p1 <- 0.4  # Proportia companiilor din Franta
+p2 <- 0.3  # Proportia companiilor din Germania
+p3 <- 0.3  # Proportia companiilor din Italia
+x <- 0.5  # Raportul dintre firmele din domeniul fashion și automobile
+m1 <- 1000  # Medie output firme fashion
+m2 <- 2000  # Medie output firme auto
+
+#Generăm un vector cu țările pentru fiecare companie, respectând proporțiile
+tari <- sample(c("Franta", "Germania", "Italia"), size = N, replace = TRUE, prob = c(p1, p2, p3))
+
+#Generăm un vector cu domeniile pentru fiecare companie, respectând proporțiile
+domenii <-rep(c("fashion", "automobile"), each = N * x)
+#Generăm output-ul pentru fiecare companie, folosind distribuții normale
+output_fashion <- rnorm(N * x, mean = m1, sd = 1.5 * m1)
+output_auto <- rnorm(N * x, mean = m2, sd = 0.75 * m2)
+output <- c(output_fashion, output_auto)
+
+#Generăm costurile totale pentru fiecare companie, folosind formula dată și distribuția normală pt e
+e <- rnorm(N *2* x, mean = 20, sd = 4)
+cost_total <- 1.5 * x * output^2 + 1.2 * output + e
+
+#Generăm profiturile totale pentru fiecare companie
+profit_total <- 3.2 * cost_total
+
+#Calculăm rata de rentabilitate
+rata_rentabilitate <- profit_total / cost_total
+
+#Venit total
+venit_total<-profit_total-cost_total
+#Data frame final
+data <- data.frame(Tara = tari, Domeniu = domenii, Output = output, CostTotal = cost_total, ProfitTotal = profit_total, RataRentabilitate = rata_rentabilitate)
+windows()
+par(mfrow=c(2,1))
+plot(density(venit_total),col="lightblue")
+plot(density(rata_rentabilitate),col="lightblue")
+
+
+profit_total_italia <- sum(data$ProfitTotal[data$Tara == "Italia"])
+cost_total_fashion<-sum(data$CostTotal[data$Domeniu=="fashion"])
+
+medieFashion<-mean(cost_total_fashion)
+QF<-quantile(cost_total_fashion)
+QF<-q[3]
+medianaFashion<-q[2]#mediana
+abatere_standardF<-sd(cost_total_fashion)
+cvFashion<-sd(cost_total_fashion)/mean(cost_total_fashion)
+
+mediePI<-mean(profit_total_italia)
+QPI<-quantile(profit_total_italia)
+QPI<-q[3]
+medianaPI<-q[2]
+abatere_standardPI<-sd(profit_total_italia)
+cvPI<-sd(profit_total_italia)/mean(profit_total_italia)
+
+m<-matrix(c(QF,medianaFashion,medieFashion,cvFashion,QPI,medianaPI,mediePI,cvPI),nrow=4,byrow = T)
+colnames(m)<-c("CostTotalFirmeItalia","ProfitTotalFirmeItalia")
+rownames(m)<-c("Q3","Mediana","Medie","Coeficient de variatie")
+
+
+m<-matrix(c(QF,medianaFashion,medieFashion,cvFashion,QPI,medianaPI,mediePI,cvPI),ncol = 4,byrow = F)
+colnames(m)<-c("Q3","Mediana","Medie","Coeficient de variatie")
+rownames(m)<-c("CostTotalFirmeFashion","ProfitTotalItalia")
+
+cost_total_Franta<-sum(data$CostTotal[data$Tara=="Franta"])
+mean(cost_total_Franta)
+sd(cost_total_Franta)
+interval1<-mean(cost_total_Franta)+sd(cost_total_Franta)
+
+#Varianta 2 de rezolvare
+
+Tari<-sample(c("Franta", "Germania","Italia"),size=N,replace = TRUE, prob = c(p1,p2,p3))
+Domenii<-rep(c("fashion","automobile"))                     
+outputFashion<-rnorm(N, mean=m1,sd=1.5*m1)                      
+outputAuto<-rnorm(N, mean=m2, sd=0.75*m2)
+output<-c(outputFashion,outputAuto)
+e<-rnorm(N, mean=20,sd=4)
+costuriTotale<-1.5*x*output^2+1.2*output+e
+profitTotal<-3.2*costuriTotale
+venitTotal<-profitTotal+costuriTotale
+rataRentabilitate<-profitTotal/venitTotal
+date<-data.frame(Tari,Domenii,output,costuriTotale,profitTotal,venitTotal)
+#Pas1
+windows()
+par(mfrow=c(2,2))
+plot(venitTotal,type = "l",col="red",main="Evolutie venit total")
+plot(rataRentabilitate,type = "l",col="blue",main="evolutie rata rentabilitate")
+plot(venitTotal,col="red",main="Evolutie venit total")
+
+#Pas2
+costTotalFashion<-sum(date$costuriTotale[date$Domenii=="fashion"])
+profitTotalItalia<-sum(date$profitTotal[date$Tari=="Italia"])
+q1<-quantile(costTotalFashion)
+QF<-q1[3]
+medianaF<-q1[2]#mediana
+medieF<-mean(costTotalFashion)
+sd(costTotalFashion)
+cvFashion<-sd(costTotalFashion)/mean(costTotalFashion)
+
+q2<-quantile(profitTotalItalia)
+QPI<-q2[3]
+medianaPI<-q2[2]#mediana
+mediePI<-mean(profitTotalItalia)
+sd(profitTotalItalia)
+cvProfitItalia<-sd(profitTotalItalia)/mean(profitTotalItalia)
+
+m<-matrix(c(QF,medianaF,medieF,cvFashion,QPI,medianaPI,mediePI,cvProfitItalia),ncol = 4,byrow = F)
+row.names(m)<-c("Cost total firme fashion","Profit total firme Italia")
+colnames(m)<-c("Q3","Mediana","Medie","CV")
+m
+
+#Pas3
+costTotalFashionFranta<-sum(date$costuriTotale[date$Tari=="Franta"]&date$costuriTotale[date$Domenii=="fashion"])
+costTotalAutomobileFranta<-sum(date$costuriTotale[date$Tari=="Franta"]&date$costuriTotale[date$Domenii=="automobile"])
+
+medieFashionFranta<-mean(date$costuriTotale[date$Tari=="Franta" & date$costuriTotale[date$Domenii=="fashion"]])
+abatereFashionFranta<-sd(date$costuriTotale[date$Tari=="Franta" & date$costuriTotale[date$Domenii=="fashion"]])
+medieAutomobileFranta<-mean(date$costuriTotale[date$Tari=="Franta"&date$costuriTotale[date$Domenii=="automobile"]])
+abatereAutomobileFranta<-sd(date$costuriTotale[date$Tari=="Franta"& date$costuriTotale[date$Domenii=="automobile"]])
+media<-c(medieFashionFranta,medieAutomobileFranta)
+abatere<-c(abatereFashionFranta,abatereAutomobileFranta)
+interval1<-media+abatere
+interval2<-media-abatere
+intervale<-c(interval1,interval2)

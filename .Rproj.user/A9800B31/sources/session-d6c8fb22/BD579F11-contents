@@ -1,0 +1,90 @@
+#N=287
+id<-1:287
+set.seed(1)
+
+tara<-sample(c("Franta","Germania","Italia"),replace=TRUE,size=287,prob = c(0.16,0.35,0.49))
+tara<-factor(tara)
+set.seed(2)
+
+domeniu<-sample(c("fashion","automobile"),size=287,replace=TRUE,prob=c(0.1,0.9))
+domeniu<-factor(domeniu)
+
+compania<-data.frame(id,tara,domeniu)
+set.seed(3)
+
+outputfashion<-subset(compania,compania$domeniu=="fashion")
+set.seed(4)
+outputautomobile<-subset(compania,compania$domeniu=="automobile")
+
+outputfashion$output<-rnorm(dim(outputfashion)[1],18592,1.5*18592)
+outputautomobile$output<-rnorm(dim(outputautomobile)[1],6474,0.75*6474)
+e<-rnorm(287,20,4)
+compania<-rbind(outputfashion,outputautomobile)
+set.seed(5)
+
+compania$cost<-1.5*9*(compania$output)^2+1.2*(compania$output)+e
+set.seed(6)
+compania$profit<-3.2*(compania$cost)
+set.seed(7)
+compania$venit<-compania$profit+compania$cost
+set.seed(8)
+compania$rent<-compania$profit/compania$venit
+attach(companie)
+
+#Pas1
+venit_fashion<-subset(compania[,7],compania$domeniu=="fashion")
+venit_automobile<-subset(compania[,7],compania$domeniu=="automobile")
+rentabilitate_fashion<-subset(compania[,8],compania$domeniu=="fashion")
+rentabilitate_automobile<-subset(compania[,8],compania$domeniu=="automobile")
+
+hist(compania$venit,col="purple",main="distributia venitului")
+hist(compania$rent,col="pink",main="distributia rentabilitatii")
+
+plot(compania$venit,col="purple",main="distributia venitului",type="l")
+windows()
+par(mfrow=c(4,4))
+plot(venit_fashion,col="purple",main="distributia venitului",type = "l")
+plot(venit_automobile,col="purple",main="distributia venitului",type = "l")
+plot(rentabilitate_fashion,col="lightblue",main="distributia rentabilitatii",type = "l")
+plot(rentabilitate_automobile,col="lightblue",main="distributia rentabilitatii",type = "l")
+#din grafice putem observa ca distributia venitului atat din domeniul fashion cat si din auto oscileaza puternic,seria de date avand o 
+#amplitudine mare
+#in ceea ce priveste rata de rentabilitate de la cele doua domenii putem observa ca este constanta
+
+#pas2
+firme_fashion<-subset(compania,compania$domeniu=="fashion")
+cost_firme_fashion<-firme_fashion[,5]
+
+q3F<-quantile(cost_firme_fashion)
+medianaF<-median(cost_firme_fashion)
+medieF<-mean(cost_firme_fashion)
+cvF<-sd(cost_firme_fashion)/mean(cost_firme_fashion)
+
+firme_italia<-subset(compania,compania$tara=="Italia")
+profit_firme_italia<-firme_italia[,6]
+
+q3I<-quantile(profit_firme_italia)
+medianaI<-median(profit_firme_italia)
+medieI<-mean(profit_firme_italia)
+cvI<-sd(profit_firme_italia)/mean(profit_firme_italia)
+
+matrice_peti<-matrix(nrow=2,ncol = 4)
+matrice_peti[1,]<-c(q3F[4],medianaF,medieF,cvF)
+matrice_peti[2,]<-c(q3I[4],medianaI,medieI,cvI)
+row.names(matrice_peti)<-c("Cost total firme fashion","Profit total firme Italia")
+colnames(matrice_peti)<-c("Q3","mediana","medie","CV")
+
+#Pas3
+firme_auto_Franta<-subset(compania,compania$domeniu=="automobile"&compania$tara=="Franta")
+firme_fashion_Franta<-subset(compania,compania$domeniu=="fashion"&compania$tara=="Franta")
+
+medie_firme_auto_Franta<-mean(firme_auto_Franta$cost)
+medie_firme_fashion_Franta<-mean(firme_fashion_Franta$cost)
+
+abatere_firme_auto_Franta<-sd(firme_auto_Franta$cost)
+abatere_firme_fashion_Franta<-sd(firme_fashion_Franta$cost)
+
+firme_auto_Franta[,1][which(firme_auto_Franta$cost<(medie_firme_auto_Franta-abatere_firme_auto_Franta)|firme_auto_Franta$cost>(medie_firme_auto_Franta+abatere_firme_auto_Franta))]
+firme_fashion_Franta[,1][which(firme_fashion_Franta$cost<(medie_firme_fashion_Franta-abatere_firme_fashion_Franta)|firme_fashion_Franta$cost>(medie_firme_fashion_Franta+abatere_firme_fashion_Franta))]
+
+

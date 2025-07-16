@@ -1,0 +1,169 @@
+#Problema 1
+#pas 1 
+setwd("D:\\Materii ANUL 2 SEM 2\\MICRO MANAGERIALA\\TEST 1047")
+date <- read.csv("DateTEST.csv",header=TRUE,sep=";",dec=".")
+date_32 <- date[219:318,]
+data_frame_mihnea <- date_32[,-1]
+#reprezentare grafica
+attach(date_32) 
+plot.ts(IndiceNasdaq,col="red")
+plot.ts(ILMN,col="blue")
+plot.ts(PYPL,col="yellow")
+
+#interpretare  observam ca pretul actiunilor ILMN nu a avut fluctuatii foarte mari osciland pe o raz de 10 dolara
+# asa cum reiese si din analiza graficului.pretul actiunilor PYPL urmeaza un trend ascendent crescand de la 83
+# dolari la 106 .Indicele de piata Nasdaq a avut un trend descendent in prima parte a analizei,urmand apoi o crestere
+#depasind astfel la finalul perioadei analizate pretul initial analizat.
+
+
+#pas 2
+
+matrice_corelatie <- cor(data_frame_mihnea)
+library(corrplot)
+corrplot(matrice_corelatie)
+
+#variabilele pret sunt puternic corelate deoarece coef de varatie au valori ridicate de peste 75% astfel 
+# se poate deduce ca piata este una cu concurenta puternica in care firmele tin cont una de preturile
+#celeilalte (0.77 intre ILMN SI PYPL SI aprox 0.87 intre cele 2 firme si indicele de piata)
+
+#pas 3
+windows()
+par(mfrow=c(3,3))
+plot(density(IndiceNasdaq),col="red",main="densitate de probabilitate nasdaq")
+plot(density(ILMN),col="blue",main="densitate de probabilitate ILMN",)
+plot(density(PYPL),col="yellow",main="densitate de probabilitate PYPL")
+boxplot(IndiceNasdaq,horizontal=TRUE,col="red",main="boxplot nasdaq")
+boxplot(ILMN,horizontal=TRUE,col="blue",main="boxplot ILMN")
+boxplot(PYPL,horizontal=TRUE,col="yellow",main="boxplot PYPL")
+
+library(moments)
+skewness(IndiceNasdaq)
+skewness(ILMN)
+skewness(PYPL)
+kurtosis(IndiceNasdaq)
+kurtosis(ILMN)
+kurtosis(PYPL)
+
+#urmarind coeficientii de asimetrie,se poate observa ca acestia au o valoare apropiata de 0 in cazul firmei PYPL(0.15)
+#unde avem o asimetrie f mica de dreapta.In cazul ILMN SI indicelui nasdaq asimetria este una moderata de stanga(fapt ce ne
+#sugereaza ca avem mai multe valori situate peste medie.) asa cum  se poate observa si din analiza diagramelor densitate de probabilitate
+##BOXPLOT situat mai spre stanga,asimetrie de dreapta deci avem valori mai multe peste medie 
+#interpretand coeficientii de boltire urmaresc o distributie platocurtica, avand valori putin mai mici decat valoarea de referinta 3(2.64-indice de piata,2,62-ILMN si 2.13 -PYPL)
+# In cazul acestor tipuri de distributii avem o împrastiere mai mare a datelor și mai multi outlieri 
+# se pot regasi in seria de date fata de cazul distributiei normale. 
+
+#Din analiza boxplot se poate observa in cazul indicelui de piata ca avem un outlier situat in zona stanga,acesta avut o
+#valoare extrem negativa care poate sa fi rezultat in urma unui eveniment economic cu puternic impact asupra preturilor
+#actiunilor la bursa. In cazul celor 2 firme nu avem outlieri ceea ce indica faptul ca nu au fost evenimente care sa determine modificari
+#considerabile ale preturilor si riscul este unul relativ scazut,preturile situandu-se la un nivel apropiat.
+
+
+
+#PAS 4
+
+zile_dateIndice <-Date[which(IndiceNasdaq>mean(IndiceNasdaq)+3*sd(IndiceNasdaq))]
+zile_date_Companie <-Date[which(PYPL>mean(PYP)+3*sd(PYP))]
+
+#nu avem valori ale preturilor situate la peste 3 abateri standard de medie
+
+
+
+#problema 2
+
+#N=287
+id <- 1:287
+set.seed(1)
+judete <- sample(c("Timis","Ilfov","Suceava"),replace=TRUE,size=287,  prob=c(0.16,0.35,0.49))
+judete <- factor(judete)
+
+set.seed(2)
+domeniu <- sample(c("Industrie","Transporturi"),replace=TRUE,size=287,  prob=c(0.1,0.9))
+judete <- factor(judete)
+
+companie <- data.frame(id,judete,domeniu)
+set.seed(3)
+
+outputind <-subset(companie,companie$domeniu=="Industrie")
+set.seed(4)
+outputtr <-subset(companie,companie$domeniu=="Transporturi")
+
+outputind$output <- rnorm(dim(outputind)[1],18592,1.5*18592)
+outputtr$output <-  rnorm(dim(outputtr)[1],6474,0.25*6474)
+e <- rnorm(287,10,2)
+companie <- rbind(outputind,outputtr)
+set.seed(5)
+companie$venit <- 1.2*9*(companie$output)^2+2*(companie$output)+e
+set.seed(6)
+companie$cost <-6/16*(companie$venit)
+set.seed(7)
+companie$profit <- companie$venit-companie$cost
+set.seed(8)
+companie$rent <- companie$profit/companie$venit
+attach(companie)
+costuri_ind <- subset(companie[,6],companie$domeniu=="Industrie")
+costuri_tr <- subset(companie[,6],companie$domeniu=="Transporturi")
+rentabilitati_ind <- subset(companie[,8],companie$domeniu=="Industrie")
+rentabilitati_tr <- subset(companie[,8],companie$domeniu=="Transporturi")
+# pas 1
+hist(companie$cost,main="distributie costuri totale",col="red")
+hist(companie$rent,main="distributie rate rentabilitate",col="blue")
+plot.ts()
+plot(companie$cost,col="red",type="l")
+#   lines(costuri_ind,col="brown")     lines merge doar peste histograma
+plot(costuri_ind,main="distributie costuri totale industrie",col="red",type="l")
+plot(costuri_tr,main="distributie costuri totale transporturi",col="blue",type="l")
+plot(rentabilitati_ind,main="distributie rate rentabilitate",col="blue",type="l")
+plot(rentabilitati_tr,main="distributie rate rentabilitate",col="blue",type="l")
+
+#asa cum se poate vedea si din distributiile grafice,costurile firmelor oscileaza puternic in timp ce in 
+#transport se poate observa acelasi fenomen seria de date avand o amplitudine mare
+# in ceea ce priveste ratele de rentabilitate,acestea se mentin constante la o cota de 0.625
+#pas 2
+matrice_mihnea <- matrix(ncol=2,nrow=4)
+firme_timis <- subset(companie,judete=="Timis")
+rate_rentabilitate_timis <- firme_timis[,8]
+q3_timis <- quantile(rate_rentabilitate_ind)
+medie_timis <- mean(rate_rentabilitate_timis)
+mediana_timis <- median(rate_rentabilitate_timis)
+cv_timis <- sd(rate_rentabilitate_timis)/mean(rate_rentabilitate_timis) #cv=rad(dispersie) ,disperisia=suma(xi=xmed)^2/n
+sd(rate_rentabilitate_timis)
+firme_ind <- subset(companie,domeniu=="Industrie")
+rate_rentabilitate_ind <- firme_ind[,8]
+q3_ind <- quantile(rate_rentabilitate_ind)
+medie_ind <- mean(rate_rentabilitate_ind)
+mediana_ind <- median(rate_rentabilitate_ind)
+cv_ind <- sd(rate_rentabilitate_ind)/mean(rate_rentabilitate_ind)
+
+colnames(matrice_mihnea) <- c("rentaiblitati_timis","rentabilitati_industrie")
+rownames(matrice_mihnea) <- c("quartila 3","mediana","media","cv")
+
+matrice_mihnea[,1] <- c(q3_timis[4],medie_timis,mediana_timis,cv_timis)
+matrice_mihnea[,2] <- c(q3_ind[4],medie_ind,mediana_ind,cv_ind)
+
+#avand 2 serii de date cu rentabilitati constante,mediana,media, modul cat si cuartilele vor fi egale cu 
+#valoarea constanta a sirului(0.625) dupa cum se poate observa si in matricea construita.Abaterea este si ea 0 intrucat valorile sunt
+# egale cu media
+
+
+
+#pas 3
+firme_transport_Timis <- subset(companie,domeniu=="Transporturi" & judete=="Timis")
+firme_transport_Suceava <- subset(companie,domeniu=="Transporturi"& judete=="Suceava")
+firme_transport_Ilfov <- subset(companie,domeniu=="Transporturi" & judete=="Ilfov")
+medie_firme_transport_Timis <-mean(firme_transport_Timis$profit) 
+medie_firme_transport_Suceava <-mean(firme_transport_Suceava$profit)
+medie_firme_transport_Ilfov <- mean(firme_transport_Ilfov$profit)
+abatere_firme_transport_Timis <-sd(firme_transport_Timis$profit) 
+abatere_firme_transport_Suceava <-sd(firme_transport_Suceava$profit)
+abatere_firme_transport_Ilfov <- sd(firme_transport_Ilfov$profit)
+
+
+
+firme_transport_Timis[,1][which(firme_transport_Timis$profit <(medie_firme_transport_Timis-2*abatere_firme_transport_Timis) | firme_transport_Timis$profit >(medie_firme_transport_Timis+2*abatere_firme_transport_Timis))]
+firme_transport_Suceava[,1][which(firme_transport_Suceava$profit <(medie_firme_transport_Suceava-2*abatere_firme_transport_Suceava) | firme_transport_Suceava$profit >(medie_firme_transport_Suceava+2*abatere_firme_transport_Suceava))]
+firme_transport_Ilfov[,1][which(firme_transport_Ilfov$profit <(medie_firme_transport_Ilfov-2*abatere_firme_transport_Ilfov) | firme_transport_Ilfov$profit >(medie_firme_transport_Ilfov+2*abatere_firme_transport_Ilfov))]
+# asa cum se poate observa in cazul firmelor de transport din suceava,firmele cu id_ul 24,34 ,154 ,170 si 262 
+# se incadreaza in ami mult de 2 abateri standard fata de medie,ceea ce sugereaza ca acestea sunt valori extreme sau chiar outlieri
+# in cazul firmelor de transport ilfov avem 5 firme care se nu se incadreaza in 2 abater standard de la medie
+# iar in cazul firmelor din timis ,acestea nu au valori in mai mult/mai putin de 2 abateri standard ceea ce sugereaza ca valorile sunt apropiate de medie si nu avem
+#o amplitudine mare a setului de valori inregistrate

@@ -1,0 +1,527 @@
+# Introducere -------------------------------------------------------------
+
+
+#ALT-sageata
+x<-1:50 #generare vector x cu valori de la 1 la 50
+x[3] #afisare valoare de pe pozitia 3
+#afiseaza valorile de pe pozitiile 3,5,11
+#x[3,5,11]#incorect
+x[c(3,5,11)]#functia c() concateneaza elementele specificate intr-un singur vector
+#construiti un vector y pornind de la vectorul x, inlocuind elementele de pe pozitiile 7 si 13 cu 100
+y<-x
+y[c(7,13)]<-100
+y[13]
+#?matrix()
+is.matrix(x)
+m<-matrix(data=c(10,10,3,1,2,3,7,5,90),nrow=3,ncol=3,byrow=F)
+m[2,3]#imi afiseaza elementul de pe linia 2 coloana 3
+m[2,]#imi afiseaza linia 2
+#View(m)
+row.names(m) <- c("r1","r2","r3")
+colnames(m) <- c("c1","c2","c3")
+#dimnames(m)
+
+# Seminar 4 Introducere continuare ----------------------------------------
+
+#extrag a doua coloana a matricii m
+m[,2]
+coloana2<-m[,2]
+#suma elementelor coloanei doi
+suma<-sum(coloana2)
+#ridicati la puterea a doua toate elementele
+patrat<-coloana2^2
+m^2
+#patratul matricii
+m%*%m
+#inversa unei matrici
+solve(m)
+#transpusa
+tm<- t(m)
+#abatere standard
+sd(coloana2)
+#matrice a 10:18, pe randuri, 3x3
+a<-matrix(10:18,nrow=3,byrow=T)
+produs<-m%*%a
+
+# Generare valori aleatoare -----------------------------------------------
+
+#?seq()
+s<-seq(from=0, to=10,by=0.5)
+min(s)
+max(s)
+mean(s)
+var(s)
+windows()
+plot(s)
+#?plot()
+plot(s,type="l",col="red",main="Repezentare secventa",ylab="valori", xlab="nr")
+plot(s,type="h",col="red",main="Repezentare secventa",ylab="valori")
+
+#generati n=100 de valori N(m=5,s=1.3)
+n=100
+medie=5
+sd=1.3
+set.seed(1044)#setam ca sa controlam valorile
+valori <- rnorm(n,medie,sd)
+mean(valori)
+sd(valori)
+min(valori)
+which.min(valori)#identific pozitiile pentru un anumit element
+valori[30]
+valori[valori==min(valori)]#alta metoda cand nu stim which
+#valori[which(valori==min(valori))]
+#sortare <- sort(valori, decreasing=TRUE) 
+sortare<-sort(valori, decreasing=TRUE)
+windows()
+plot(sortare, type="h")
+hist(valori)#ne arata distribuita valorilor, cum sunt distribuite pe fiecare interval
+hist(valori,freq=F, col="lightblue",main="Distributie")#in loc de frecventa apar probabilitati pt ca avem false, cu main modific titlul
+
+# Import date in R --------------------------------------------------------
+#import din txt
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")#pun\\ca sa-l poata citi
+actiuni<-read.table("PFE.txt", header=TRUE,sep="\t",dec=".")
+
+#import csv
+actiuni2 <-read.csv("PFE.csv",header=TRUE,sep=",",dec=".")
+fix(actiuni)#deschide un tabel separat cu datele noastre
+head(actiuni)#afiseaza capul de tabel
+names(actiuni)#un vector cu denumirile variabilelor
+mean(actiuni$Pret.PFE)
+attach(actiuni)
+mean(Pret.PFE)
+
+#construiti un data frame cu urmatoarele coloane:data, pret PFE si pret S&P
+actiuni_comune <- actiuni[,c(1,4,5)]#selectez coloanele data,pret pfe, pret indice, nu pun nimic in fata deoarece vreau sa selectez toate liniile
+#daca in fata lui c pun - sterg coloanele
+#alta varianta
+#actiuni_comune <- actiuni[,-c(2,3)]
+actiuni_comune <- data.frame(Date,Pret.PFE,Pret.Indice.S.P.)
+
+#pasul 2 Furnizaţi statisticile descriptive pentru datele din noul fişier
+summary(actiuni_comune[,-1])#c concateneaza, daca vreau doar una nu mai pun c
+?write.csv()
+
+#Scrie intr-un csv rezultatele de la summary
+write.csv(s,"summary.csv")
+
+#matrice cu amplitudine si abatere standard pentru PFE si S&P
+m <- matrix(c(diff(range(Pret.PFE)),diff(range(Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.)),nrow=2,byrow=T)
+row.names(m) <- c("Amplit","sd")
+colnames(m) <- c("PFE","S&P")
+max(Pret.Indice.S.P.)
+Date[which.max(Pret.Indice.S.P.)]#data in care s-a inregistrat valoarea maxima
+
+#Reprezentati grafic evolutia
+plot(Pret.Indice.S.P., type="l")
+ts <- data.frame(Pret.PFE,Pret.Indice.S.P.)
+plot.ts(ts,plot.type="multiple")
+plot.ts(ts,plot.type="single")#nu folosim single pt ca e diferenta la scala(pfe e de ordinul zecilor, iar s&p e de ordinul miilor)
+
+# Analiza distributiilor --------------------------------------------------
+windows()
+par(mfrow=c(2,1))#par seteaza parametrii
+hist(Pret.Indice.S.P.)
+hist(Pret.PFE)#asimetrie la stanga la PFE,coef de asimetrie e negativ,asimetrie la dreapta la s&p, coef de asimetrie pozitiv
+install.packages("moments")
+library(moments)
+skewness(Pret.Indice.S.P.)
+skewness(Pret.PFE)
+kurtosis(Pret.Indice.S.P.)#daca e mai >3 este letocurtice, daca e <3 este platicurtica, =3 mezo
+kurtosis(Pret.PFE)#distributiile noastre sunt platicurtice
+matr_corelatie <- cor(ts)#matricea de corelatie
+#calculatia matricea de corelatie pt toate var pret
+co <- data.frame(Pret.PFE,Pret.AAPL,Pret.MRK,Pret.MSFT,Pret.Indice.S.P.)
+matr_corelatie <- cor(co)#daca vreau sa vad doar matricea de corelatie rulez doar matr_corelatie
+install.packages("corrplot")
+library(corrplot)
+windows()
+corrplot(matr_corelatie)
+
+install.packages("corrplot")
+R <- cor(actiuni[,-1])
+library(corrplot)
+windows()
+corrplot(R,type="upper",method="ellipse")
+
+#Reprezentare boxplot
+attach(actiuni)
+boxplot(Pret.PFE, horizontal = TRUE)
+install.packages("moments")
+library(moments)
+casSP <- skewness(Pret.Indice.S.P.)
+boxplot(Pret.PFE,horizontal=T)
+casPFE <- skewness(Pret.PFE)
+quantile(Pret.PFE)
+windows()
+par(mfrow=c(2,2))#seteaza param de pe grafic
+boxplot(Pret.Indice.S.P.,horizontal=TRUE,col="red", main="Boxplot Pret Indice")
+hist(Pret.Indice.S.P.,col="red")
+boxplot(Pret.PFE,horizontal=TRUE,col="green")
+hist(Pret.PFE,col="green")
+
+m <- matrix(c(diff(range(Pret.PFE)),diff(range(Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.)),nrow=2,byrow=T)
+row.names(m) <- c("Amplit","sd")
+colnames(m) <- c("PFE","S&P")
+cvSP <-100*sd(Pret.Indice.S.P.)/mean(Pret.Indice.S.P.)#covarianta
+cvPFE <-100*sd(Pret.PFE)/mean(Pret.PFE)
+#daca abaterea este mai mare, exista un risc mai mare pt investitori, este o incertitudine
+m <- matrix(c(diff(range(Pret.PFE)),diff(range(Pret.Indice.S.P.)),sd(Pret.PFE),sd(Pret.Indice.S.P.),cvPFE,cvSP),nrow=3,byrow=T)
+row.names(m) <- c("Amplit","sd","cv")
+colnames(m) <- c("PFE","S&P")
+m
+
+
+# generare date frame companii --------------------------------------------
+
+#n=1500 de companii, sectoare de activitate: Agricultura(5%), Industrie(35%), Comert(15%), Transporturi(25%), Turism(20%)
+#dimensiunea firmei: mici(60%), mijlocii(30%), mari(10%)
+id <- 1:1500
+set.seed(1)
+sector <- sample(c("Agr","Ind","Comert","Transp","Turism"),size=1500,replace=TRUE,prob=c(0.05,0.35,0.15,0.25,0.20))
+#sample extrage aleator dintr-o multime cu revenire si spuneam ca sunt probabilitatile, 
+#dintr-o multime x, cate extrag, daca fac extragere cu revenire sau fara revenire
+sector <-factor(sector)#transforma in variabila categoriala(nu mai am variabile numerice)
+table(sector)#ne da frecventele pe fiecare categorie in parte, ne gaseste distributia variabilei categoriale, ne da frecventele pe fiecare categorie in parte(avem 5 categorii)
+#variabila categoriala dimensiune
+
+set.seed(2)#controleaza valorile
+dim <- sample(1:3,size=1500,replace=T,prob=c(0.6,0.3,0.1))##alta metoda pt sample
+dim <- factor(dim)
+is.factor(dim)#verifica daca este dim
+table(dim)#observa ca ne lipseste eticheta
+levels(dim) <-c("mici","medii","mari")
+table(dim)#rulez iar ca sa-mi apara cum voiam, cap de tabel fiind mici, medii, mari
+
+#acum ne facem data frame-ul
+companii <-data.frame(id, sector,dim)
+#intersectia sectorului cu dimensiunea
+table(sector,dim)#imi arata pt fiecare sector care este distributia pe dim
+
+#adaugam alte caracteristici
+#generare venit
+#Firme mari N(800000,170000) distributia normala(medie,ab std)
+#Firme medii N(600000,140000)
+#Firme mici N(300000,90000)
+
+#Firme mari
+#generare pt firme mari, folosim data frame-ul creat
+#table(companii$dim)
+dfmari <- subset(companii,companii$dim=="mari")
+#functia subset ii dau data farme-ul mare si la al doilea argument conditia,
+#pe care dintre companii vreau sa le extrag(daca in table e scris "mari" aici trebuie scrisa la fel variabila)
+#adaug o variabila numerica, venitul, care respecta legea din ipoteza
+set.seed(3)
+dfmari$venit <-rnorm(dim(dfmari)[1],800000,170000)
+#din vector ne intereseaza doar prima pozitie(de asta punem 1, daca rulam dim(dfmari))ne da un vector(cate linii are data frame-ul dfmari)
+#daca rulam dim(dfmari) ne da un vect(cate linii are data frame-ul dfmari)
+View(dfmari)
+
+#Firme medii
+dfmedii <-subset(companii,companii$dim=="medii")
+set.seed(4)
+dfmedii$venit <-rnorm(dim(dfmedii)[1],600000,140000)
+
+#Firme mici
+dfmici <-subset(companii, companii$dim=="mici")
+set.seed(5)
+dfmici$venit <- rnorm(dim(dfmici)[1],300000,90000)#R NORM PT CA URMEAZA O DISTIBUTIE NORMALA
+
+
+#Unire data frame-uri
+companii <- rbind(dfmari,dfmedii,dfmici)#functia rbind uneste randurile, cbind uneste coloanele
+
+#Generare variabila investitii
+#investitiile=10000+0.4*venit+eps
+#eps ~ N(0,1)
+set.seed(6)
+eps <-rnorm(1500)#am pus 1500 deoarece atatea valori aveam la inceput
+companii$investitii <- 10000+0.4*companii$venit+eps
+
+#generare costuri
+#mari ~N(400000,200000)
+#medii ~N(350000,100000)
+#mici ~ N(140000,60000)
+set.seed(7)
+companii$costuri <-rep(0,1500)
+companii$costuri[which(companii$dim=="mari")]<-rnorm(dim(dfmari)[1],400000,200000)
+#in coloana costuri in data frame companii pe acele randuri unde gasesc eticheta mari sa pune rnorm de dim
+proba <- which(companii$dim=="mari")
+
+set.seed(8)
+companii$costuri[which(companii$dim=="medii")]<-rnorm(dim(dfmedii)[1],350000,100000)
+
+set.seed(9)
+companii$costuri[which(companii$dim=="mici")]<-rnorm(dim(dfmici)[1],140000,60000)
+
+#aflati cate firme mari sunt in industrie
+dfmariind<-subset(companii,companii$dim=="mari" & companii$sector=="Ind")
+#data frame-ul si dupa avem doua conditii //sau cu which
+dim(dfmariind)[1]
+
+#calculati media veniturilor si reprezentati boxplot(venit) pentru firmele mici din turism, 
+dfmiciInd<-subset(companii, dim="mici" & sector=="Ind")
+mean(dfmiciInd$venit)
+companii$profit<-companii$venit-companii$costuri
+companii$rent<-companii$profit/companii$venit
+ind<-subset(companii, sector=="Ind")
+mri<-mean(ind$rent)
+sdri<-sd(ind$rent)
+#comparati cu boxplot pentru firme mici din comert
+#reprezentati grafic dependenta dintre investitii si venit
+
+
+# Estimare cerere ---------------------------------------------------------
+
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+cerere <- read.csv("cerere.csv", header=TRUE,sep=";",dec=".")
+
+#Analiza evolutie FOOD
+attach(cerere)
+serii <- ts(cbind(FOOD,PFOOD),start=1959)
+windows()
+plot.ts(serii,plot.type="multiple")
+modifFOOD <- 100*diff(FOOD)/FOOD[-45]
+#obtinem diferenta fata de anul anterior prin diff(FOOD)
+#scadem 45 deoarece avem nevoie de 44 de valori, ultima nu se foloseste, avem in total 45 de observatii
+
+modifPFOOD <- 100*diff(PFOOD)/PFOOD[-45]
+modificari <- data.frame(1960:2003, modifFOOD, modifPFOOD)
+
+# care este anul in care s- a inregistrat cea mai mare crestere a cererii
+which.max(modificari$modifFOOD)
+modificari[,1][which.max(modificari$modifFOOD)]
+#extrage anul in care am avut cea mai mare crestere
+
+#anii in care cererea a scazut cu peste 1%
+modificari[,1][which(modificari$modifFOOD < (-1))]
+hist(modificari$modifFOOD)
+cerere$PFOODr<-100*PFOOD/PTPE
+
+cerere$PFOODr <- cerere$PFOOD/cerere$PTPE#impart la indicele de pret ca sa pot sa obtin val reala
+cvFOOD <- sd(cerere$FOOD)/mean(cerere$FOOD)
+cvPFOODr <-sd(cerere$PFOODr)/mean(cerere$PFOODr)
+q <- quantile(cerere$FOOD)
+mean(cerere$FOOD)
+q[3]#returneaza mediana
+windows()
+plot(density(cerere$FOOD))
+windows()
+boxplot(cerere$FOOD, horizontal=T)
+install.packages("moments")
+library(moments)
+skewness(cerere$FOOD)
+#corelatia dintre pret si cerere scatter plot
+windows()
+plot(cerere$PFOODr,cerere$FOOD)
+abline(lm(cerere$FOOD~cerere$PFOODr),col="lightblue")
+cor(FOOD,PFOODr)#pret mai mare, cerere mai mica
+
+#Reprezentare sctter plot
+par(mfrow=c(1,1))
+plot(cerere$PFOODr,cerere$FOOD)
+abline(lm(FOOD~PFOODr,data=cerere),col="red")
+
+#Functie de cerere directa liniara
+model1<-lm(FOOD~PFOODr,data=cerere)
+summary(model1)
+#FOOD=cerere+b*pret
+#y=a+bx y-FOOD, x-PFOODr;  D(p)=a+b*p (cerere directa) a+b*p functie liniara; D(p)=1515*35-10285p;
+#panta dreptei=efect marginal, ne arata ce se intampla cu cererea la modificarea cu o unitate a pretului.
+#p value si restul arata daca sunt coeficientii statistic eficienti
+#multiple r variatia in cerere e explicata in proportie de 40% in variatia pretului
+attach(cerere)
+cerere$PFOODr<-100*PFOOD/PTPE
+
+model1$coefficients
+confint(model1)#  a este in intervalul de incredere 1110.662 si 1920.0381 si b este in
+
+#Rezidurile modelului
+r<-model1$residuals#valorile reziduale=valori obs-valori estimate
+cerereEstimata <- model1$fitted.values#valori estimate
+
+#distributia rezidurilor
+hist(r)
+plot(r, type="l")
+
+#cerere indirecta
+#p=f(y)
+#fct putere
+#p=a*y^alfa
+#alfa=elasticitate, cu cat % se modif pretul cand cerere se modif cu 1 %
+#logaritmam fct putere
+#log p=log a +alfa log y
+
+#Cerere indirecta
+model1i<-lm(PFOODr~FOOD, data=cerere)
+summary(model1i)
+#fct neliniara-fct putere
+
+model2<-lm(log(PFOODr)~log(FOOD), data=cerere)
+summary(model2)
+#alfa=-0.14 a este log din rez de acolo, 5.54
+a<-exp(model2$coefficients[1])
+a
+#p=255.32*y^(-0.14)
+#reziduuri model2
+plot(model2$residuals, type="l")
+
+#Seminar 12
+pd<- function(y){
+  255.32*y^(-0.145)
+}
+pd(100)
+curve(pd,from=0,to=1000)
+
+#functie de cerere cu 2 factori 
+plot(DPI, type="l")
+#are un trend foarte ascendent, venitul personal este nestationar pt ca nu are fluctuatii evidente
+#functie de cerere liniara(directa)-valoarea cantitatii in functie de venit disponibil si pret
+model3<-lm(FOOD~PFOODr+DPI, data=cerere)
+summary(model3)
+options(scipen=999)
+#y^D=139,34+0.53*PFOODr+0.05*DPI valoarea estimata a cererii(valoarea estimata nu e egala cu valoarea reala a cererii) )
+resid<-resid(model3)
+ajustare<-fitted(model3)
+serii<-data.frame(resid,ajustare,FOOD)
+plot.ts(serii,plot.type = "multiple")
+#rezidurile, adica erorile sunt foarte mari in unele zone
+
+#reprezentare grafica 3D
+install.packages("scatterplot3d")
+library(scatterplot3d)
+scatterplot3d(PFOODr,DPI,FOOD)
+
+#functie putere- functie de cerere directa
+model4<-lm(log(FOOD)~log(PFOODr)+log(DPI),data=cerere)
+summary(model4)
+#coef DPI e 0,5-> la crestererea pretului cu 1%,  venitului disponibil creste cu 0.5% 
+
+#coobb douglas Y=A*P^alfa*V^beta
+#Tema: aceeasi analiza pt functia indirecta
+
+#Estimare costuri
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+costuri<-read.csv("date_seminar_costuri.csv",sep=",")
+denumiri<-names(costuri)
+costuri<-costuri[,-1]
+names(costuri)<-denumiri[-9]
+View(costuri)
+
+summary(costuri)
+atlanta<-subset(costuri,costuri$MSA=="ATLANTA")
+summary(atlanta)
+
+#Seminar 13
+denver<-subset(costuri,costuri$MSA=="DENVER")
+denver$landR<-denver$Land_Value/denver$Land_Price_Index
+View(denver)
+summary(denver)
+serii<-data.frame(denver$Land_Value,denver$landR)
+plot.ts(serii,plot.type = "multiple")
+
+
+?unique()
+unique(costuri$MSA)
+costuri$region <- ifelse(costuri$MSA %in% c('BUFFALO', 
+                                'CHICAGO', 
+                                'CINCINNATI', 
+                                'CLEVELAND', 
+                                'COLUMBUS', 
+                                'DETROIT', 
+                                'INDIANAPOLIS',
+                                'KANSASCITY', 
+                                'MILWAUKEE', 
+                                'DETROIT', 
+                                'MINNEAPOLISSTPAUL', 
+                                'PITTSBURGH', 
+                                'ROCHESTER', 
+                                'STLOUIS' ), "Midwest", 
+                     ifelse ( costuri$MSA %in% c('ATLANTA', 
+                                         'BIRMINGHAM', 
+                                         'CHARLOTTE', 
+                                         'MEMPHIS', 
+                                         'TAMPA'), 'Southeast', 
+                              ifelse ( costuri$MSA %in% c('DALLAS', 
+                                                  'DENVER', 
+                                                  'FORTWORTH',
+                                                  'HOUSTON',
+                                                  'NEWORLEANS',
+                                                  'OKLAHOMACITY',	
+                                                  'PHOENIX',
+                                                  'SALTLAKECITY',
+                                                  'SANANTONIO'),'Southwest',	
+                                       ifelse( costuri$MSA %in% c('BALTIMORE',
+                                                          'BOSTON',
+                                                          'HARTFORD',	
+                                                          'MIAMI',
+                                                          'NEWYORK',
+                                                          'NORFOLK',
+                                                          'PHILADELPHIA',
+                                                          'PROVIDENCE',
+                                                          'WASHINGTONDC'),'East Coast', 'West Coast'))))
+unique(costuri$region)
+write.csv(costuri,file="costuri.csv")
+se<-subset(costuri,costuri$region=="Southeast")
+quantile(se$Home_Value)
+install.packages("ggplot2")
+library(ggplot2)
+plot1<-ggplot(data=se,aes(x=Home_Value))+
+  geom_histogram(colour="pink",fill="lightblue")+
+  xlab("Valoarea locuintei")+
+  ylab("Frecventa")+
+  theme_minimal()
+windows()
+plot1
+
+plot2<-ggplot(data=se,aes(x=Home_Value))+
+  geom_boxplot(fill="pink")+
+  theme_light()
+plot2
+#asimetrie la dreapta
+#comportament de outlieri
+
+plot3<-ggplot(data=se,aes(x=Date,y=Home_Value,col=MSA))+
+  geom_point(shape=1)
+plot3
+#grafic pentru evolutii
+#tendinta generala a oraselor a mers cam la fel
+
+#Grafic pt 2 orase
+plot4<-ggplot(data=subset(se,MSA=="ATLANTA"|MSA=="MEMPHIS"),aes(x=Date,y=Home_Value,col=MSA))+
+  geom_point(shape=1)
+plot4
+
+#Seminar14
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+costuri<-read.csv("date_seminar_costuri.csv",sep=",")
+library(ggplot2)
+table(costuri$region)
+se<-subset(costuri,costuri$region=="Southeast" & Date=="2016Q1")
+windows()
+plot5<- ggplot(data=se, aes(x=Home_Value,y=Structure_Cost))+
+  geom_point(aes(size=Land_Share,colour=Land_Value))+
+  geom_text(aes(label=MSA))+
+  theme_light()
+plot5
+
+#estimare functie cost liniara
+atlanta<-subset(costuri,MSA=="ATLANTA")
+atlanta$yr<-atlanta$Home_Value/atlanta$Home_Price_Index
+functieL<-lm(Structure_Cost~Home_Value,data=atlanta)
+options(scripen=999)
+summary(functieL)
+#estimare functie cost neliniara
+#CT(y)=Ay^alfa
+functiaN<-lm(log(Structure_Cost)~log(Home_Value),data=atlanta)
+  ggplot(data=atlanta,aes(x=log(Home_Value),y=log(Structure_Cost)))+
+  geom_point(colour="blue",shape=6)+
+  geom_smooth(aes(x=log(Home_Value),y=log(Structure_Cost)),method="lm",se=T,col="red")+
+  theme_light()
+summary(functiaN)
+exp(coef(functiaN)[1])
+hist(resid(functieL))
+plot(resid(functiaN))
+#dizeconomii la scala
+#CT(y)=Ay^alfa
+#CT estimat=0,21*y^1,1

@@ -1,0 +1,110 @@
+setwd("C:\\Users\\Andrei Peticila\\Desktop\\mm")
+date_cerere<-read.csv("cerere.csv",header = T,sep=";",dec = ".")
+date_cerere_selectate<-date_cerere[1:20,]
+data_frame_peti_cerere<-date_cerere_selectate[,-1]
+attach(date_cerere_selectate)
+names(date_cerere_selectate)
+windows()
+plot(FOOD,col="pink",main="grafic FOOD",type="l")
+plot(FURN,col="purple",main="grafic FURN",type="l")
+plot(GAS,col="yellow",main="grafic GAS",type="l")
+matrice_cor<-cor(data_frame_peti_cerere)
+library(corrplot)
+corrplot(matrice_cor)
+windows()
+par(mfrow=c(3,3))
+plot(density(FOOD),col="pink",main="densitati de prob FOOD")
+plot(density(FURN),col="purple",main="densitati de prob FURN")
+plot(density(GAS),col="yellow",main="densitati de prob GAS")
+boxplot(FOOD,horizontal = T, col="pink",main="boxplot FOOD")
+boxplot(FURN,horizontal = T, col="purple",main="boxplot FURN")
+boxplot(GAS,horizontal = T, col="yellow",main="boxplot GAS")
+
+library(moments)
+#coef de asimetrie
+skewness(FOOD)
+skewness(FURN)
+skewness(GAS)
+#coef de aplatizare
+kurtosis(FOOD)
+kurtosis(FURN)
+kurtosis(GAS)
+
+zile_DateFOOD<-Date[which(FOOD>mean(FOOD)+3*sd(FOOD))]
+zile_DateFURN<-Date[which(FURN>mean(FURN)+3*sd(FURN))]
+
+#problema2
+id<-1:287
+set.seed(1)
+j<-sample(c("Timis","Ilfov","Suceava"),size=287,replace=T,prob = c(0.16,0.35,0.49))
+j<-factor(j)
+set.seed(2)
+d<-sample(c("industrie","transporturi"),size=287,replace=T,prob=c(0.1,0.9))
+d<-factor(d)
+c<-data.frame(id,j,d)
+set.seed(3)
+opind<-subset(c,c$d=="industrie")
+set.seed(4)
+optransp<-subset(c,c$d=="transporturi")
+opind$output<-rnorm(dim(opind)[1],18592,1.5*18592)
+optransp$output<-rnorm(dim(optransp)[1],6474,0.25*6474)
+e<-rnorm(287,10,2)
+c<-rbind(opind,optransp)
+set.seed(5)
+c$venit<-1.2*9*(c$output)^2+2*(c$output)+e
+set.seed(6)
+c$costuri<-6/16*c$venit
+set.seed(7)
+c$profit<-c$venit-c$costuri
+set.seed(8)
+c$rent<-c$profit/c$venit
+set.seed(9)
+hist(c$costuri,col="pink",main = "distributia costurilor totale")
+hist(c$rent,col="purple",main="distributia rentabilitatii totale")
+cost_i<-subset(c[,6],c$d=="industrie")
+cost_a<-subset(c[,6],c$d=="transporturi")
+rent_i<-subset(c[,8],c$d=="industrie")
+rent_a<-subset(c[,8],c$d=="transporturi")
+hist(cost_i,col="pink",main = "distributia costurilor ind")
+hist(cost_a,col="purple",main="distributia costurilor transp")
+hist(rent_i,col="pink",main = "distributia rent ind")
+hist(rent_a,col="purple",main="distributia rentabilitatii transp")
+
+firme_Timis<-subset(c,c$j=="Timis")
+rent_Timis<-firme_Timis[,8]
+q<-quantile(rent_Timis)
+q3T<-q[4]
+medianaTimis<-median(rent_Timis)
+medieTimis<-mean(rent_Timis)
+cvTimis<-sd(rent_Timis)/mean(rent_Timis)
+
+firme_industrie<-subset(c,c$d=="industrie")
+rent_ind<-firme_industrie[,8]
+q<-quantile(rent_ind)
+q3ind<-q[4]
+medianaind<-median(rent_ind)
+medieind<-mean(rent_ind)
+cvind<-sd(rent_ind)/mean(rent_ind)
+
+matricep<-matrix(nrow = 4,ncol = 2)
+row.names(matricep)<-c("q3","mediana","medie","cv")
+colnames(matricep)<-c("rent_Timis","rent_ind")
+matricep[,1]<-c(q3T,medianaTimis,medieTimis,cvTimis)
+matricep[,2]<-c(q3ind,medianaind,medieind,cvind)
+
+f_transp_Timis<-subset(c,c$d=="transporturi"&c$j=="Timis")
+f_transp_Ilfov<-subset(c,c$d=="transporturi"&c$j=="Ilfov")
+f_transp_Suceava<-subset(c,c$d=="transporturi"&c$j=="Suceava")
+
+medie_f_transp_Timis<-mean(f_transp_Timis$profit)
+medie_f_transp_Ilfov<-mean(f_transp_Ilfov$profit)
+medie_f_transp_Suceava<-mean(f_transp_Suceava$profit)
+
+ab_f_transp_Timis<-sd(f_transp_Timis$profit)
+ab_f_transp_Ilfov<-sd(f_transp_Ilfov$profit)
+ab_f_transp_Suceava<-sd(f_transp_Suceava$profit)
+
+f_transp_Timis[,1][which(f_transp_Timis$profit<(medie_f_transp_Timis-2*ab_f_transp_Timis)|f_transp_Timis$profit>(medie_f_transp_Timis+2*ab_f_transp_Timis))]
+f_transp_Ilfov[,1][which(f_transp_Ilfov$profit<(medie_f_transp_Ilfov-2*ab_f_transp_Ilfov)|f_transp_Ilfov$profit>(medie_f_transp_Ilfov+2*ab_f_transp_Ilfov))]
+f_transp_Timis[,1][which(f_transp_Suceava$profit<(medie_f_transp_Suceava-2*ab_f_transp_Suceava)|f_transp_Suceava$profit>(medie_f_transp_Suceava+2*ab_f_transp_Suceava))]
+
